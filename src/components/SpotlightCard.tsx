@@ -66,7 +66,7 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
       }
       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
       style={enableTilt ? { transformPerspective: 1100 } : undefined}
-      className={`relative overflow-hidden ${className}`}
+      className={`relative overflow-hidden spotlight-card-wrapper ${className}`}
     >
       {/* Pointer-following dynamic spotlight (Cobalt in dark, Royal Amber Gold in light) */}
       <div
@@ -77,7 +77,9 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
           background: `radial-gradient(460px circle at ${mousePos.x}px ${mousePos.y}px, var(--spotlight-color, rgba(37, 99, 235, 0.13)), transparent 70%)`,
         }}
       />
-      <div className="relative z-10 h-full flex flex-col justify-between">{children}</div>
+      <div className="relative z-10 h-full flex flex-col justify-between spotlight-glitch-target">
+        {children}
+      </div>
     </Component>
   );
 };

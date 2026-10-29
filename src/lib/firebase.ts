@@ -27,6 +27,7 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 import { DEFAULT_PROFILE_DATA } from '../data/defaultProfile';
 import { ProfileData } from '../types/profile';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 export const ADMIN_EMAIL = 'solijonsolayev2003@gmail.com';
 export const FIREBASE_PROJECT_ID = firebaseConfig.projectId;
@@ -217,15 +218,39 @@ export function subscribeToPortfolio(
           commons: data.commons || d.commons,
           taplink: data.taplink || d.taplink,
           etiquetteNote: data.etiquetteNote || d.etiquetteNote,
-          heroImageUrl: data.heroImageUrl || d.heroImageUrl,
+          heroImageUrl: resolveAssetUrl(data.heroImageUrl, d.heroImageUrl),
           yearsOfExperience: data.yearsOfExperience || d.yearsOfExperience,
         },
         metrics: Array.isArray(data.metrics) ? data.metrics : DEFAULT_PROFILE_DATA.metrics,
         services: Array.isArray(data.services) ? data.services : DEFAULT_PROFILE_DATA.services,
         skillGroups: Array.isArray(data.skillGroups) ? data.skillGroups : DEFAULT_PROFILE_DATA.skillGroups,
-        projects: Array.isArray(data.projects) ? data.projects : DEFAULT_PROFILE_DATA.projects,
+        projects: Array.isArray(data.projects)
+          ? data.projects.map((proj: ProfileData['projects'][number], idx: number) => {
+              const fallbackProj =
+                DEFAULT_PROFILE_DATA.projects.find((dp) => dp.id === proj.id) ||
+                DEFAULT_PROFILE_DATA.projects[idx % DEFAULT_PROFILE_DATA.projects.length];
+              return {
+                ...proj,
+                imageUrl: resolveAssetUrl(proj.imageUrl, fallbackProj?.imageUrl || ''),
+              };
+            })
+          : DEFAULT_PROFILE_DATA.projects,
         experience: Array.isArray(data.experience) ? data.experience : DEFAULT_PROFILE_DATA.experience,
-        blogPosts: Array.isArray(data.blogPosts) ? data.blogPosts : DEFAULT_PROFILE_DATA.blogPosts,
+        blogPosts: Array.isArray(data.blogPosts)
+          ? data.blogPosts.map((post: NonNullable<ProfileData['blogPosts']>[number], idx: number) => {
+              const fallbackPost =
+                (DEFAULT_PROFILE_DATA.blogPosts || []).find((bp) => bp.id === post.id) ||
+                (DEFAULT_PROFILE_DATA.blogPosts || [])[
+                  idx % Math.max(1, (DEFAULT_PROFILE_DATA.blogPosts || []).length)
+                ];
+              return {
+                ...post,
+                imageUrl: post.imageUrl
+                  ? resolveAssetUrl(post.imageUrl, fallbackPost?.imageUrl || '')
+                  : fallbackPost?.imageUrl || '',
+              };
+            })
+          : DEFAULT_PROFILE_DATA.blogPosts,
       };
       onData(loaded);
     },

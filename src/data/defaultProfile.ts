@@ -1,4 +1,5 @@
 import { ProfileData } from '../types/profile';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 export const DEFAULT_PROFILE_DATA: ProfileData = {
   personal: {
@@ -25,7 +26,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
     taplink: 'https://taplink.cc/solijon_solayev',
     etiquetteNote:
       'Muloqot odobi: Vaqtni qadrlashingizni so\'rayman. «Salom» yoki «Alo» deb javob kutmasdan, savol yoki taklifingizni bitta aniq va tushunarli xabarda to\'liq yozib qoldiring.',
-    heroImageUrl: '/src/assets/images/hero_developer_workspace_1793267849323.jpg',
+    heroImageUrl: resolveAssetUrl('/src/assets/images/hero_developer_workspace_1793267849323.jpg'),
     yearsOfExperience: '2003-yilda tug\'ilgan',
   },
   metrics: [
@@ -142,7 +143,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'TypeScript va 3D veb-grafika yordamida sayyoralar harakati, quyosh tizimi va osmon sferasini real vaqtda hisoblab ko\'rsatuvchi interaktiv Solaris 3D platformasi ishlab chiqildi.',
       impactMetric: 'solaris3d.uz · Real vaqt 3D astronomiya va optik simulyatsiya',
       technologies: ['TypeScript', '3D WebGL', 'Astronomiya Simulyatsiyasi', 'React', 'Tailwind CSS'],
-      imageUrl: '/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg'),
       liveUrl: 'https://solaris3d.uz',
       repoUrl: 'https://github.com/SolijonSolayev/Solaris-3D-Jonli-Astronomiya-va-Kosmik-Observatoriya',
     },
@@ -162,7 +163,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'O\'zbek tili va imlo (tarixiy «Tilimlo» an\'analaridan ilhomlangan holda) qoidalariga asoslangan qulay qidiruv hamda matn tahlili vositasi sifatida tilimlo.uz loyihasi yo\'lga qo\'yildi.',
       impactMetric: 'tilimlo.uz · O\'zbek tili va imlo savodxonligi vositasi',
       technologies: ['TypeScript', 'React', 'Tailwind CSS', 'O\'zbek Tili & Imlo'],
-      imageUrl: '/src/assets/images/project_tilimlo_platform_1793272827504.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_tilimlo_platform_1793272827504.jpg'),
       liveUrl: 'https://tilimlo.uz',
       repoUrl: 'https://github.com/SolijonSolayev',
     },
@@ -182,7 +183,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'Barcha asosiy operatsion tizimlarda barqaror ishlaydigan, ochiq kodli universal formatlash dasturi ishlab chiqilib, GitHub\'da hamma uchun erkin taqdim etildi.',
       impactMetric: 'Linux · Windows · macOS qo\'llab-quvvatlovi',
       technologies: ['Python', 'Cross-Platform', 'Linux', 'Windows', 'macOS'],
-      imageUrl: '/src/assets/images/project_ai_analytics_1793267851074.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ai_analytics_1793267851074.jpg'),
       liveUrl: 'https://github.com/SolijonSolayev/usb-formatter',
       repoUrl: 'https://github.com/SolijonSolayev/usb-formatter',
     },
@@ -202,7 +203,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'Har uchala operatsion tizim uchun maxsus moslashtirilgan, foydalanuvchi fayllariga zarar yetkazmasdan faqat keraksiz keshni tozalaydigan skriptlar jamlanmasi yaratildi.',
       impactMetric: 'Tezkor xotira bo\'shatish va tizim profilaktikasi',
       technologies: ['Shell / Scripts', 'macOS', 'Linux', 'Windows', 'Open Source'],
-      imageUrl: '/src/assets/images/project_fintech_platform_1793267850542.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_fintech_platform_1793267850542.jpg'),
       liveUrl: 'https://github.com/SolijonSolayev/AqlliTozalash',
       repoUrl: 'https://github.com/SolijonSolayev/AqlliTozalash',
     },
@@ -222,7 +223,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'Koeffitsiyentlar kiritilishi bilan diskriminant va tenglama ildizlarini formulalar asosida bosqichma-bosqich chiqarib beruvchi qulay veb-interfeys tuzildi.',
       impactMetric: 'Qadam-baqadam tahlil va tushunarli matematik yechim',
       technologies: ['HTML5', 'CSS3', 'JavaScript', 'Matematik Algoritm'],
-      imageUrl: '/src/assets/images/project_mobile_banking_1793267852640.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_mobile_banking_1793267852640.jpg'),
       liveUrl: 'https://github.com/SolijonSolayev/kvadrat-tenglamalar',
       repoUrl: 'https://github.com/SolijonSolayev/kvadrat-tenglamalar',
     },
@@ -242,7 +243,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
         'Toza tipografiya, tartibli grid tizimi va mobil qurilmalarga moslashuvchan sahifalar yaratilib, GitHub\'ga joylashtirildi.',
       impactMetric: 'Toza veb-maketlar va amaliy frontend tajriba',
       technologies: ['HTML5', 'CSS3', 'Tailwind CSS', 'React', 'GitHub Pages'],
-      imageUrl: '/src/assets/images/project_ecommerce_engine_1793267852059.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ecommerce_engine_1793267852059.jpg'),
       liveUrl: 'https://solijonsolayev.github.io/',
       repoUrl: 'https://github.com/SolijonSolayev',
     },
@@ -306,7 +307,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
       published: true,
       excerpt:
         'Osmon sirlari, quyosh tutilishi, sayyoralar harakati va osmon sferasini o\'zbek tilida interaktiv 3D WebGL simulyatsiya orqali kuzatish imkonini beruvchi Solaris 3D platformasining texnik arxitekturasi haqida.',
-      imageUrl: '/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg'),
       tags: ['Solaris 3D', 'Astronomiya', '3D WebGL', 'TypeScript', 'solaris3d.uz'],
       content: `## Nima uchun Solaris 3D loyihasiga qo'l urdim?
 
@@ -356,7 +357,7 @@ Hozirda **solaris3d.uz** platformasiga yangi yulduz kataloglari, sun'iy yo'ldosh
       published: true,
       excerpt:
         'O\'zbek tilida bexato yozish, elektron matnlar tahlili, Tilimlo.uz platformasining yaratilish tarixi hamda diakritik harflar (Ö, Ğ, Ş, Ç) bilan ishlashning texnik jihatlari.',
-      imageUrl: '/src/assets/images/project_tilimlo_platform_1793272827504.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_tilimlo_platform_1793272827504.jpg'),
       tags: ['Tilimlo.uz', "O'zbek tili", 'Imlo', 'Alifbo 2026', 'tilimlo.uz'],
       content: `## Ona tilimizning raqamli makondagi o'rni
 
@@ -387,7 +388,7 @@ Avtomatik transliteratsiya tizimlarini yozishda eng nozik nuqta — **tutuq belg
       published: true,
       excerpt:
         'Kundalik kompyuter foydalanuvchilari va dasturchilar uchun yaratilgan usb-formatter hamda AqlliTozalash kross-platforma dasturlarining ishlash tamoyili.',
-      imageUrl: '/src/assets/images/project_ai_analytics_1793267851074.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ai_analytics_1793267851074.jpg'),
       tags: ['Python', 'Linux', 'Open Source', 'GitHub', 'usb-formatter', 'AqlliTozalash'],
       content: `## Kundalik ehtiyojdan tug'ilgan ochiq kodli dasturlar
 
@@ -423,7 +424,7 @@ Barcha dasturlarimning manba kodlari [GitHub sahifamda (@SolijonSolayev)](https:
       published: true,
       excerpt:
         'O\'zbek tilidagi sifatli ilmiy-ensiklopedik maqolalar, Wikimedia Commons erkin media bazasi uchun fotografiya hamda YouTube va Telegramda foydali kontent yaratish haqida mulohazalar.',
-      imageUrl: '/src/assets/images/project_ecommerce_engine_1793267852059.jpg',
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ecommerce_engine_1793267852059.jpg'),
       tags: ['Vikipediya', 'Wikimedia Commons', 'Fikr qilamiz', 'Fotografiya', 'YouTube'],
       content: `## O'zbek tilidagi erkin bilim zahirasi qanday boyitiladi?
 

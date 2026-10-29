@@ -214,12 +214,4 @@ Solijon Solayev
 
 ## Litsenziya
 
-Ushbu loyihada repositoryda aniq litsenziya fayli ko’rsatilmagan. Agar loyiha ommaviy ravishda tarqatiladigan bo’lsa, yaxshi natija uchun `MIT` yoki boshqa mos litsenziya qo’shish tavsiya etiladi.
 
----
-
-Agar xohlasangiz, men bundan keyin quyidagilarning birini ham tayyorlab beraman:
-- yanada professional va GitHubga mos README
-- ingliz tilida README
-- badges + screenshot placeholder + deployment bo’limi bilan mukammal versiya
-- qisqa, ammo chiroyli “short README” versiyasi

@@ -38,7 +38,6 @@ import {
   QrCode,
   Rss,
   Search,
-  ShieldCheck,
   Sparkles,
   Terminal,
   Trash2,
@@ -800,17 +799,6 @@ export default function App() {
                   })}
                 </div>
 
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => openAdminPanel()}
-                    className="px-3.5 py-2 text-xs font-medium text-white bg-blue-600/20 border border-blue-500/50 rounded-lg hover:bg-blue-600/30 transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                    {tr('Admin Panel')}
-                  </button>
-                )}
-
                 <button
                   type="button"
                   onClick={() => setIsCommandPaletteOpen(true)}
@@ -892,16 +880,6 @@ export default function App() {
                 })}
               </div>
 
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => openAdminPanel()}
-                  className="px-3.5 py-2 text-xs font-medium text-white bg-blue-600/20 border border-blue-500/50 rounded-lg hover:bg-blue-600/30 transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                  {tr('Admin Panel')}
-                </button>
-              )}
               <button
                 type="button"
                 onClick={() => setIsCommandPaletteOpen(true)}

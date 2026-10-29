@@ -209,10 +209,17 @@ export function subscribeToPortfolio(
               ? data.headline
               : d.headline,
           shortBio:
-            data.shortBio && data.shortBio.includes('Kiberxavfsizlik')
+            data.shortBio &&
+            data.shortBio.includes('Teamit Academy') &&
+            data.shortBio.includes('Jizzax politexnika')
               ? data.shortBio
               : d.shortBio,
-          detailedBio: data.detailedBio || d.detailedBio,
+          detailedBio:
+            data.detailedBio &&
+            data.detailedBio.includes('Teamit Academy') &&
+            data.detailedBio.includes('Jizzax politexnika')
+              ? data.detailedBio
+              : d.detailedBio,
           location: data.location || d.location,
           availability: data.availability || d.availability,
           email: data.publicEmail || d.email,
@@ -233,31 +240,93 @@ export function subscribeToPortfolio(
         services: Array.isArray(data.services) ? data.services : DEFAULT_PROFILE_DATA.services,
         skillGroups: Array.isArray(data.skillGroups) ? data.skillGroups : DEFAULT_PROFILE_DATA.skillGroups,
         projects: Array.isArray(data.projects)
-          ? data.projects.map((proj: ProfileData['projects'][number], idx: number) => {
-              const fallbackProj =
-                DEFAULT_PROFILE_DATA.projects.find((dp) => dp.id === proj.id) ||
-                DEFAULT_PROFILE_DATA.projects[idx % DEFAULT_PROFILE_DATA.projects.length];
-              return {
-                ...proj,
-                imageUrl: resolveAssetUrl(proj.imageUrl, fallbackProj?.imageUrl || ''),
-              };
-            })
+          ? (() => {
+              const defaultProjList = DEFAULT_PROFILE_DATA.projects;
+              const fsProjList = data.projects as ProfileData['projects'];
+              const fsMap = new Map(fsProjList.map((p) => [p.id, p]));
+              const merged: ProfileData['projects'] = [];
+              const processed = new Set<string>();
+
+              for (const defProj of defaultProjList) {
+                processed.add(defProj.id);
+                const fsProj = fsMap.get(defProj.id);
+                if (fsProj) {
+                  merged.push({
+                    ...defProj,
+                    ...fsProj,
+                    imageUrl: resolveAssetUrl(fsProj.imageUrl, defProj.imageUrl),
+                  });
+                } else {
+                  merged.push(defProj);
+                }
+              }
+              for (const fsProj of fsProjList) {
+                if (!processed.has(fsProj.id)) {
+                  merged.push({
+                    ...fsProj,
+                    imageUrl: resolveAssetUrl(fsProj.imageUrl, ''),
+                  });
+                }
+              }
+              return merged;
+            })()
           : DEFAULT_PROFILE_DATA.projects,
-        experience: Array.isArray(data.experience) ? data.experience : DEFAULT_PROFILE_DATA.experience,
+        experience: Array.isArray(data.experience)
+          ? (() => {
+              const defaultExpList = DEFAULT_PROFILE_DATA.experience;
+              const fsExpList = data.experience as ProfileData['experience'];
+              const fsMap = new Map(fsExpList.map((e) => [e.id, e]));
+              const merged: ProfileData['experience'] = [];
+              const processed = new Set<string>();
+
+              for (const defItem of defaultExpList) {
+                processed.add(defItem.id);
+                const fsItem = fsMap.get(defItem.id);
+                if (fsItem) {
+                  merged.push({ ...defItem, ...fsItem });
+                } else {
+                  merged.push(defItem);
+                }
+              }
+              for (const fsItem of fsExpList) {
+                if (!processed.has(fsItem.id)) {
+                  merged.push(fsItem);
+                }
+              }
+              return merged;
+            })()
+          : DEFAULT_PROFILE_DATA.experience,
         blogPosts: Array.isArray(data.blogPosts)
-          ? data.blogPosts.map((post: NonNullable<ProfileData['blogPosts']>[number], idx: number) => {
-              const fallbackPost =
-                (DEFAULT_PROFILE_DATA.blogPosts || []).find((bp) => bp.id === post.id) ||
-                (DEFAULT_PROFILE_DATA.blogPosts || [])[
-                  idx % Math.max(1, (DEFAULT_PROFILE_DATA.blogPosts || []).length)
-                ];
-              return {
-                ...post,
-                imageUrl: post.imageUrl
-                  ? resolveAssetUrl(post.imageUrl, fallbackPost?.imageUrl || '')
-                  : fallbackPost?.imageUrl || '',
-              };
-            })
+          ? (() => {
+              const defaultPosts = DEFAULT_PROFILE_DATA.blogPosts || [];
+              const fsPosts = data.blogPosts as NonNullable<ProfileData['blogPosts']>;
+              const fsMap = new Map(fsPosts.map((bp) => [bp.id, bp]));
+              const merged: NonNullable<ProfileData['blogPosts']> = [];
+              const processed = new Set<string>();
+
+              for (const defPost of defaultPosts) {
+                processed.add(defPost.id);
+                const fsPost = fsMap.get(defPost.id);
+                if (fsPost) {
+                  merged.push({
+                    ...defPost,
+                    ...fsPost,
+                    imageUrl: resolveAssetUrl(fsPost.imageUrl, defPost.imageUrl),
+                  });
+                } else {
+                  merged.push(defPost);
+                }
+              }
+              for (const fsPost of fsPosts) {
+                if (!processed.has(fsPost.id)) {
+                  merged.push({
+                    ...fsPost,
+                    imageUrl: resolveAssetUrl(fsPost.imageUrl, ''),
+                  });
+                }
+              }
+              return merged;
+            })()
           : DEFAULT_PROFILE_DATA.blogPosts,
       };
       onData(loaded);

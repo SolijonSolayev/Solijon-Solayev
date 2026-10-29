@@ -2,7 +2,7 @@ import { ProfileData } from '../types/profile';
 
 export type UzbekAlphabetMode = 'new_2026' | 'classic';
 
-export const ALPHABET_STORAGE_KEY = 'solijon_uzbek_alphabet_mode_v1';
+export const ALPHABET_STORAGE_KEY = 'solijon_uzbek_alphabet_mode_v2';
 
 // Technical English words containing "sh" or "ch" that should never be transliterated
 const PROTECTED_TECH_WORDS = new Set([
@@ -140,14 +140,19 @@ export function toNewUzbekLatin(text: string): string {
 function transformPlainSegmentToClassicLatin(segment: string): string {
   if (!segment) return segment;
   let res = segment;
-  res = res.replace(/Ö/g, "O'");
-  res = res.replace(/ö/g, "o'");
-  res = res.replace(/Ğ/g, "G'");
-  res = res.replace(/ğ/g, "g'");
+  res = res.replace(/Ö/g, 'Oʻ');
+  res = res.replace(/ö/g, 'oʻ');
+  res = res.replace(/Ğ/g, 'Gʻ');
+  res = res.replace(/ğ/g, 'gʻ');
   res = res.replace(/Ş/g, 'Sh');
   res = res.replace(/ş/g, 'sh');
   res = res.replace(/Ç/g, 'Ch');
   res = res.replace(/ç/g, 'ch');
+  // Standardize straight quotes for O' and G' in classic mode
+  res = res.replace(/O['’‘`]/g, 'Oʻ');
+  res = res.replace(/o['’‘`]/g, 'oʻ');
+  res = res.replace(/G['’‘`]/g, 'Gʻ');
+  res = res.replace(/g['’‘`]/g, 'gʻ');
   return res;
 }
 

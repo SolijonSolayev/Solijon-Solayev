@@ -910,51 +910,33 @@ export default function App() {
         </div>
       </header>
 
-      <main id="top" className="flex-1 relative z-10">
-        {/* Mobile & Sub-page Quick Navigation Bar */}
-        <div className="md:hidden border-b border-zinc-800/80 bg-[#0A0A0D]/95 backdrop-blur-md px-3 py-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 w-max">
-            {(
-              [
-                { id: 'home', labelKey: 'navAbout' as const },
-                { id: 'loyihalar', labelKey: 'navProjects' as const },
-                { id: 'blog', labelKey: 'navBlog' as const },
-                { id: 'tajriba', labelKey: 'navExperience' as const },
-                { id: 'boglanish', labelKey: 'navContact' as const },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => navigateToPage(tab.id)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
-                  activePage === tab.id
-                    ? 'bg-blue-600 text-white font-semibold'
-                    : 'text-zinc-400 hover:text-white bg-[#0F0F12] border border-zinc-800'
-                }`}
-              >
-                {getTranslation(tab.labelKey, language, alphabetMode)}
-              </button>
-            ))}
+      <main id="top" className="flex-1 relative z-10 pb-20 md:pb-0">
+        {/* Mobile Quick Utility Bar */}
+        <div className="md:hidden border-b border-zinc-800/80 bg-[#0A0A0D]/95 backdrop-blur-md px-3 py-2 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              soundEffects.playClick();
+              setIsCommandPaletteOpen(true);
+            }}
+            title={language === 'en' ? 'Quick search & command palette' : tr('Tezkor qidiruv va buyruqlar oynasi')}
+            className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer inline-flex items-center justify-between"
+          >
+            <span className="inline-flex items-center gap-1.5 truncate">
+              <Search className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="truncate">{getTranslation('search', language, alphabetMode)}</span>
+            </span>
+            <kbd className="px-1.5 py-0.5 text-[9px] font-mono-tabular bg-zinc-900 border border-zinc-800 rounded text-zinc-400 shrink-0">
+              ⌘K
+            </kbd>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                soundEffects.playClick();
-                setIsCommandPaletteOpen(true);
-              }}
-              title={language === 'en' ? 'Quick search' : tr('Tezkor qidiruv')}
-              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer inline-flex items-center gap-1"
-            >
-              <Search className="w-3.5 h-3.5 text-blue-400" />
-              <span>{getTranslation('search', language, alphabetMode)}</span>
-            </button>
-
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={toggleSound}
               title={soundEnabled ? 'Mute' : 'Unmute'}
-              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer inline-flex items-center gap-1"
+              className="p-2 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer"
             >
               {soundEnabled ? (
                 <Volume2 className="w-3.5 h-3.5 text-blue-400" />
@@ -967,11 +949,54 @@ export default function App() {
               type="button"
               onClick={toggleFlameCursor}
               title={flameCursorEnabled ? 'Disable Flame' : 'Enable Flame'}
-              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer inline-flex items-center gap-1"
+              className="p-2 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer"
             >
               <Flame className={`w-3.5 h-3.5 ${flameCursorEnabled ? 'text-orange-400' : 'text-zinc-500'}`} />
             </button>
           </div>
+        </div>
+
+        {/* Mobile Floating Bottom Thumb Dock Navigation (< md) */}
+        <div
+          aria-label={getTranslation('mainNavAria', language, alphabetMode)}
+          className="md:hidden fixed bottom-3 left-3 right-3 z-50 flex items-center justify-around gap-1 p-1.5 rounded-2xl bg-[#0F0F12]/95 backdrop-blur-2xl border border-zinc-800/90 shadow-2xl shadow-black/90 max-w-md mx-auto"
+        >
+          {(
+            [
+              { id: 'home', labelKey: 'navAbout' as const, icon: Info },
+              { id: 'loyihalar', labelKey: 'navProjects' as const, icon: Code2 },
+              { id: 'blog', labelKey: 'navBlog' as const, icon: BookOpen },
+              { id: 'tajriba', labelKey: 'navExperience' as const, icon: Layers },
+              { id: 'boglanish', labelKey: 'navContact' as const, icon: Mail },
+            ] as const
+          ).map((tab) => {
+            const isActive = activePage === tab.id;
+            const IconComponent = tab.icon;
+            const label = getTranslation(tab.labelKey, language, alphabetMode);
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => navigateToPage(tab.id)}
+                className={`relative flex-1 py-2 px-1 flex flex-col items-center justify-center gap-0.5 rounded-xl transition-all cursor-pointer select-none ${
+                  isActive ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="mobileBottomDockActiveTab"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute inset-0 bg-blue-600 rounded-xl shadow-md shadow-blue-600/35 -z-0"
+                  />
+                )}
+                <IconComponent className="w-4 h-4 relative z-10 shrink-0" />
+                <span className="text-[10px] font-medium leading-none tracking-tight relative z-10 truncate max-w-[62px]">
+                  {label}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Dedicated Sub-Page Top Bar (shown when viewing Loyihalar, Blog, Faoliyat, or Bog'lanish as a standalone page) */}

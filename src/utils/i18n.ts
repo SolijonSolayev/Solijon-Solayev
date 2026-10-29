@@ -151,9 +151,9 @@ export function localizeProfileForLanguage(
       headline:
         'Crafting impactful web applications, interactive 3D simulations, and open-source software.',
       shortBio:
-        'Frontend developer with a deep passion for 3D web graphics, astronomy simulations (Solaris 3D), and language accessibility tools (Tilimlo.uz).',
+        'Born in 2003 in Yangiariq, Khorezm. Earned a Bachelor degree in Transport Logistics from Jizzakh Polytechnic Institute and completed Web Programming (Frontend) at Teamit Academy in Jizzakh.',
       detailedBio:
-        "I was born in 2003 in Yangiariq district, Khorezm region. I am passionate about Information Technology (IT), Web Development (HTML, CSS, Tailwind CSS, TypeScript, React, Python), Cybersecurity, blogging, and photography.",
+        'Completed higher education in Transport Logistics at Jizzakh Polytechnic Institute and graduated from the Web Programming (Frontend) course at Teamit Academy in Jizzakh. Creator of Solaris 3D (solaris3d.uz) and Tilimlo.uz.',
       location: 'Yangiariq, Khorezm, Uzbekistan',
       availability: 'Open for Opportunities (Remote / Contract)',
       etiquetteNote: 'Fast response within 2 hours. English & Uzbek welcome.',
@@ -195,6 +195,29 @@ export function localizeProfileForLanguage(
           ? 'Building real-time WebGL, Three.js, and Canvas simulations with smooth performance and physics.'
           : s.description,
     })),
+    experience: profile.experience.map((e) => {
+      if (e.id === 'e_teamit') {
+        return {
+          ...e,
+          period: 'Studies Completed',
+          role: 'Web Programming (Frontend) Graduate',
+          company: 'Teamit Academy Learning Center',
+          location: 'Jizzakh, Uzbekistan',
+          description: 'Successfully completed the intensive practical Web Programming (Frontend) course at Teamit Academy in Jizzakh.',
+        };
+      }
+      if (e.id === 'e_jizpi') {
+        return {
+          ...e,
+          period: 'Higher Education',
+          role: 'Bachelor in Transport Logistics',
+          company: 'Jizzakh Polytechnic Institute',
+          location: 'Jizzakh, Uzbekistan',
+          description: 'Earned a Bachelor degree in Transport Logistics at Jizzakh Polytechnic Institute.',
+        };
+      }
+      return e;
+    }),
   };
 }
 

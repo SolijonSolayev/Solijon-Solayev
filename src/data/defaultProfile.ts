@@ -9,9 +9,9 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
     headline:
       'Solijon Solayev — oʻzbekistonlik dasturchi, raqamli kontent yaratuvchi (bloger) hamda zamonaviy veb-loyihalar va raqamli mahsulotlar muallifi.',
     shortBio:
-      'Men 2003-yilda Xorazm viloyati Yangiariq tumanida tug\'ilganman. Axborot texnologiyalari (IT), veb-dasturlash (HTML, CSS, Tailwind CSS, TypeScript, React, Python), Kiberxavfsizlik, blog yuritish va fotografiyaga qiziqaman.',
+      'Men 2003-yilda Xorazm viloyati Yangiariq tumanida tug‘ilganman. Oliy ta’limni Jizzax politexnika institutida Transport logistikasi yönalishi böyicha (bakalavr) tamomlaganman. Jizzax şahridagi Teamit Academy öquv markazida Web dasturlaş (frontend) kursini muvaffaqiyatli tugatganman. Axborot texnologiyalari (IT), veb-dasturlaş (HTML, CSS, Tailwind CSS, TypeScript, React, Python), Kiberxavfsizlik, blog yuritış va fotografiyaga qiziqaman.',
     detailedBio:
-      'Jonli astronomiya va kosmik kuzatuvlarga bag\'ishlangan Solaris 3D (solaris3d.uz) interaktiv observatoriyasi, o\'zbek tili va imlo vositasi Tilimlo.uz hamda GitHub\'dagi ochiq kodli utilitalar va samimiy veb-loyihalar orqali foydali texnologiyalar yaratishga intilganman.',
+      'Oliy ta’limni Jizzax politexnika institutida Transport logistikasi mutaxassisligi böyicha egallaganman hamda Jizzax şahridagi Teamit Academy öquv markazida Web dasturlaş (frontend) kursini muvaffaqiyatli tamomlaganman. Jonli astronomiya va kosmik kuzatuvlarga bağışlangan Solaris 3D (solaris3d.uz) interaktiv observatoriyasi, özbek tili va imlo vositasi Tilimlo.uz hamda GitHub’dagi oçiq kodli utilitalar va samimiy veb-loyihalar orqali foydali texnologiyalar yaratışga intilganman.',
     location: 'Xorazm, Yangiariq / O\'zbekiston',
     availability: 'Yangi g\'oyalar, amaliy loyihalar va hamkorlik uchun ochiq',
     email: 'solijonsolayev2003@gmail.com',
@@ -265,6 +265,36 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
       technologies: ['TypeScript', 'React', 'Tailwind CSS', '3D WebGL', 'Python', 'Git'],
     },
     {
+      id: 'e_teamit',
+      period: 'Öquv bosqıçı',
+      role: 'Web Dasturlaş (Frontend) Kurs Bitiruvçisi',
+      company: 'Teamit Academy Öquv Markazi',
+      location: 'Jizzax şahri · Özbekiston',
+      type: 'Ta\'lim',
+      description:
+        'Jizzax şahridagi Teamit Academy öquv markazida Web dasturlaş (frontend) amaliy va intensiv kursini muvaffaqiyatli tugatganman.',
+      achievements: [
+        'Zamonaviy veb-dasturlaş (HTML, CSS, JavaScript, React va frontend infratuzilmasi) asoslarini mukammal egalladim.',
+        'Sifatli va moslaşuvçan (responsive) veb-interfeyslar hamda amaliy loyihalar yaratış könikmasiga ega böldim.',
+      ],
+      technologies: ['Web Frontend', 'HTML5 / CSS3', 'JavaScript', 'React', 'Teamit Academy'],
+    },
+    {
+      id: 'e_jizpi',
+      period: 'Oliy ta’lim',
+      role: 'Bakalavr — Transport Logistikasi Yönalışi',
+      company: 'Jizzax Politexnika Instituti',
+      location: 'Jizzax şahri · Özbekiston',
+      type: 'Ta\'lim',
+      description:
+        'Oliy ta’limni Jizzax politexnika institutida Transport logistikasi yönalışi böyicha bakalavr darajasida öqıb tugatganman.',
+      achievements: [
+        'Transport logistikasi, ta’minot zanjirini başqarış va tizimli tahlil qılış mutaxassisligini egalladim.',
+        'Logistik jarayonlarni raqamlaştiriş hamda hisoblaş algoritmlarini qöllaş könikmalarini şakllantirdim.',
+      ],
+      technologies: ['Transport Logistikasi', 'Tizimli Tahlil', 'Logistika va Rejalashtirish', 'Oliy Ta\'lim'],
+    },
+    {
       id: 'e2',
       period: 'Doimiy faoliyat',
       role: 'Vikipediya va Vikiombor (Wikimedia Commons) Faoli',
@@ -285,7 +315,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
       role: 'IT Bloger va Kontent Muallifi',
       company: 'YouTube (@Solijon_Solayev) & «Fikr qilamiz» Telegram blogi',
       location: 'Onlayn media',
-      type: 'Ta\'lim',
+      type: 'Faoliyat',
       description:
         'Dasturlash (Python), kompyuter texnologiyalari, foydali dasturlar va IT sohasidagi yangiliklarni o\'zbek tilida sodda va tushunarli tilda yoritib borish.',
       achievements: [

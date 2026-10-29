@@ -7,9 +7,9 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
     role: 'Frontend dasturchi · Solaris 3D va Tilimlo.uz muallifi · Vikipediya faoli',
     kicker: 'Veb-dasturlash · Interaktiv 3D astronomiya · Ochiq manbali loyihalar · Vikipediya',
     headline:
-      'Solijon Solayev – oʻzbekistonlik yosh kontent kreyter (bloger), dasturchi va elektron mahsulotlar sotuvchisi.',
+      'Solijon Solayev — oʻzbekistonlik dasturchi, raqamli kontent yaratuvchi (bloger) hamda zamonaviy veb-loyihalar va raqamli mahsulotlar muallifi.',
     shortBio:
-      'Men 2003-yilda Xorazm viloyati Yangiariq tumanida tug\'ilganman. Axborot texnologiyalari (IT), veb-dasturlash (HTML, CSS, Tailwind CSS, TypeScript, React, Python), blog yuritish va fotografiya bilan shug\'ullanaman.',
+      'Men 2003-yilda Xorazm viloyati Yangiariq tumanida tug\'ilganman. Axborot texnologiyalari (IT), veb-dasturlash (HTML, CSS, Tailwind CSS, TypeScript, React, Python), Kiberxavfsizlik, blog yuritish va fotografiyaga qiziqaman.',
     detailedBio:
       'Jonli astronomiya va kosmik kuzatuvlarga bag\'ishlangan Solaris 3D (solaris3d.uz) interaktiv observatoriyasi, o\'zbek tili va imlo vositasi Tilimlo.uz hamda GitHub\'dagi ochiq kodli utilitalar va samimiy veb-loyihalar orqali foydali texnologiyalar yaratishga intilganman.',
     location: 'Xorazm, Yangiariq / O\'zbekiston',

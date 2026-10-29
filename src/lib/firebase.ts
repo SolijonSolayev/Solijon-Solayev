@@ -202,8 +202,16 @@ export function subscribeToPortfolio(
           fullName: data.fullName || d.fullName,
           role: data.role || d.role,
           kicker: data.kicker || d.kicker,
-          headline: data.headline || d.headline,
-          shortBio: data.shortBio || d.shortBio,
+          headline:
+            data.headline &&
+            !data.headline.includes('kontent kreyter') &&
+            !data.headline.includes('elektron mahsulotlar sotuvchisi')
+              ? data.headline
+              : d.headline,
+          shortBio:
+            data.shortBio && data.shortBio.includes('Kiberxavfsizlik')
+              ? data.shortBio
+              : d.shortBio,
           detailedBio: data.detailedBio || d.detailedBio,
           location: data.location || d.location,
           availability: data.availability || d.availability,

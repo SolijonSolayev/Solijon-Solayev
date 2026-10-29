@@ -3,14 +3,20 @@ import { motion, useScroll, useSpring } from 'motion/react';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   BookOpen,
   Calendar,
   Check,
+  ChevronDown,
+  ChevronUp,
   Clock,
+  Compass,
   Copy,
   Download,
   Edit3,
   ExternalLink,
+  Hash,
+  List,
   Loader2,
   Pause,
   Printer,
@@ -25,6 +31,8 @@ import {
 } from 'lucide-react';
 import { BlogPostItem, ProfileData } from '../types/profile';
 import { formatUzbekText, UzbekAlphabetMode } from '../utils/uzbekAlphabet';
+import { soundEffects } from '../utils/soundEffects';
+import { triggerHaptic } from '../hooks/useHapticFeedback';
 import { SpotlightCard } from './SpotlightCard';
 
 export interface TocHeading {
@@ -33,40 +41,45 @@ export interface TocHeading {
   level: 2 | 3;
 }
 
+export function createHeadingId(text: string, countIndex: number): string {
+  const cleanSlug = text
+    .toLowerCase()
+    .replace(/['`‘ʻʼ]/g, '')
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '');
+  return `section-${countIndex}-${cleanSlug || 'item'}`;
+}
+
 export function extractHeadings(markdown: string): TocHeading[] {
   if (!markdown) return [];
   const lines = markdown.split('\n');
   const result: TocHeading[] = [];
   let inCodeBlock = false;
+  let headingCount = 0;
 
-  lines.forEach((line, idx) => {
+  for (let idx = 0; idx < lines.length; idx++) {
+    const line = lines[idx];
     if (line.trim().startsWith('```')) {
       inCodeBlock = !inCodeBlock;
-      return;
+      continue;
     }
-    if (inCodeBlock) return;
+    if (inCodeBlock) continue;
 
     const h2Match = line.match(/^##\s+(.+)$/);
     if (h2Match) {
       const text = h2Match[1].trim();
-      const id = `section-${idx}-${text
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/gi, '-')
-        .replace(/^-|-$/g, '')}`;
+      const id = createHeadingId(text, headingCount++);
       result.push({ id, text, level: 2 });
-      return;
+      continue;
     }
 
     const h3Match = line.match(/^###\s+(.+)$/);
     if (h3Match) {
       const text = h3Match[1].trim();
-      const id = `section-${idx}-${text
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/gi, '-')
-        .replace(/^-|-$/g, '')}`;
+      const id = createHeadingId(text, headingCount++);
       result.push({ id, text, level: 3 });
     }
-  });
+  }
 
   return result;
 }
@@ -148,11 +161,13 @@ function renderInlineFormatting(text: string): React.ReactNode[] {
 interface MarkdownArticleContentProps {
   content: string;
   alphabetMode: UzbekAlphabetMode;
+  onJumpToSection?: (id: string) => void;
 }
 
 export const MarkdownArticleContent: React.FC<MarkdownArticleContentProps> = ({
   content,
   alphabetMode,
+  onJumpToSection,
 }) => {
   const [copiedBlockIdx, setCopiedBlockIdx] = useState<number | null>(null);
   const tr = (text: string) => formatUzbekText(text, alphabetMode);
@@ -162,6 +177,7 @@ export const MarkdownArticleContent: React.FC<MarkdownArticleContentProps> = ({
     const lines = content.split('\n');
     const nodes: React.ReactNode[] = [];
     let i = 0;
+    let headingCount = 0;
 
     while (i < lines.length) {
       const line = lines[i];
@@ -224,42 +240,54 @@ export const MarkdownArticleContent: React.FC<MarkdownArticleContentProps> = ({
         continue;
       }
 
-      // H2 heading
+      // H2 heading with anchor link
       const h2Match = line.match(/^##\s+(.+)$/);
       if (h2Match) {
         const text = h2Match[1].trim();
-        const id = `section-${i}-${text
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/gi, '-')
-          .replace(/^-|-$/g, '')}`;
+        const headingId = createHeadingId(text, headingCount++);
         nodes.push(
           <h2
-            id={id}
-            key={`h2-${i}`}
-            className="scroll-mt-24 font-display text-2xl sm:text-[1.65rem] font-bold text-white tracking-tight mt-10 mb-4"
+            id={headingId}
+            key={`h2-${headingId}`}
+            className="group scroll-mt-24 font-display text-2xl sm:text-[1.65rem] font-bold text-white tracking-tight mt-10 mb-4 flex items-center justify-between gap-3"
           >
-            {renderInlineFormatting(text)}
+            <span>{renderInlineFormatting(text)}</span>
+            <button
+              type="button"
+              onClick={() => onJumpToSection?.(headingId)}
+              title={tr("Bo'lim havolasi")}
+              aria-label={`${text} ${tr("bo'limi")}`}
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 hover:text-blue-400 p-1.5 rounded-lg hover:bg-zinc-800/60 focus:opacity-100 cursor-pointer shrink-0"
+            >
+              <Hash className="w-4 h-4" />
+            </button>
           </h2>
         );
         i++;
         continue;
       }
 
-      // H3 heading
+      // H3 heading with anchor link
       const h3Match = line.match(/^###\s+(.+)$/);
       if (h3Match) {
         const text = h3Match[1].trim();
-        const id = `section-${i}-${text
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/gi, '-')
-          .replace(/^-|-$/g, '')}`;
+        const headingId = createHeadingId(text, headingCount++);
         nodes.push(
           <h3
-            id={id}
-            key={`h3-${i}`}
-            className="scroll-mt-24 font-display text-xl font-semibold text-zinc-100 mt-8 mb-3"
+            id={headingId}
+            key={`h3-${headingId}`}
+            className="group scroll-mt-24 font-display text-xl font-semibold text-zinc-100 mt-8 mb-3 flex items-center justify-between gap-3"
           >
-            {renderInlineFormatting(text)}
+            <span>{renderInlineFormatting(text)}</span>
+            <button
+              type="button"
+              onClick={() => onJumpToSection?.(headingId)}
+              title={tr("Bo'lim havolasi")}
+              aria-label={`${text} ${tr("bo'limi")}`}
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 hover:text-blue-400 p-1.5 rounded-lg hover:bg-zinc-800/60 focus:opacity-100 cursor-pointer shrink-0"
+            >
+              <Hash className="w-3.5 h-3.5" />
+            </button>
           </h3>
         );
         i++;
@@ -538,6 +566,91 @@ ${post.content}
   };
 
   const headings = useMemo(() => extractHeadings(post.content), [post.content]);
+  const [activeHeadingId, setActiveHeadingId] = useState<string>('');
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
+
+  // Jump smoothly to a specific section heading with haptic, sound & visual flash
+  const handleJumpToSection = (id: string) => {
+    soundEffects.playClick();
+    triggerHaptic('selection');
+    setActiveHeadingId(id);
+
+    const targetEl = document.getElementById(id);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Trigger temporary visual highlight flash
+      targetEl.classList.remove('heading-highlight-flash');
+      void targetEl.offsetWidth; // force reflow
+      targetEl.classList.add('heading-highlight-flash');
+      setTimeout(() => {
+        targetEl.classList.remove('heading-highlight-flash');
+      }, 1500);
+
+      // Cleanly sync URL hash without triggering navigation reloads
+      if (typeof window !== 'undefined' && window.history?.replaceState) {
+        window.history.replaceState(null, '', `#${id}`);
+      }
+    }
+  };
+
+  const handleScrollToTop = () => {
+    soundEffects.playClick();
+    triggerHaptic('light');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (headings.length > 0) {
+      setActiveHeadingId(headings[0].id);
+    }
+  };
+
+  // Scrollspy: update active heading as user scrolls through article
+  useEffect(() => {
+    if (headings.length === 0) return;
+    setActiveHeadingId(headings[0].id);
+
+    // Initial hash check when deep linking to a section
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#section-')) {
+      const initId = window.location.hash.slice(1);
+      const el = document.getElementById(initId);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setActiveHeadingId(initId);
+          el.classList.add('heading-highlight-flash');
+          setTimeout(() => el.classList.remove('heading-highlight-flash'), 1500);
+        }, 300);
+      }
+    }
+
+    const headingElements = headings
+      .map((h) => document.getElementById(h.id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    if (headingElements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) {
+          const sorted = visible.sort(
+            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+          );
+          setActiveHeadingId(sorted[0].target.id);
+        }
+      },
+      {
+        rootMargin: '-85px 0px -60% 0px',
+        threshold: [0, 0.2, 1],
+      }
+    );
+
+    headingElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      headingElements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+  }, [headings, post.id]);
 
   const currentIndex = useMemo(
     () => allPosts.findIndex((p) => p.id === post.id),
@@ -573,11 +686,6 @@ ${post.content}
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col relative selection:bg-blue-600/30 selection:text-white">
-      {/* Top Reading Progress Indicator */}
-      <motion.div
-        style={{ scaleX: smoothProgress, transformOrigin: '0%' }}
-        className="fixed top-0 left-0 right-0 h-0.5 bg-blue-500 z-50"
-      />
 
       {/* Sticky Article Top Bar */}
       <header className="sticky top-0 z-40 flex items-center justify-between gap-4 px-6 lg:px-12 py-4 bg-[#050505]/90 backdrop-blur-xl border-b border-zinc-800/80">
@@ -861,7 +969,78 @@ ${post.content}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start pt-2">
           {/* Left 8 Columns: Full Article Content */}
           <div className="lg:col-span-8 space-y-8">
-            <MarkdownArticleContent content={post.content} alphabetMode={alphabetMode} />
+            {/* Mobile Collapsible Table of Contents (< lg) */}
+            {headings.length > 0 && (
+              <div className="lg:hidden rounded-2xl bg-[#0F0F12] border border-zinc-800 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEffects.playClick();
+                    triggerHaptic('light');
+                    setMobileTocOpen(!mobileTocOpen);
+                  }}
+                  className="w-full px-5 py-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-900/50 transition-colors"
+                  aria-expanded={mobileTocOpen}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <List className="w-4 h-4 text-blue-400 shrink-0" />
+                    <span className="text-sm font-semibold text-white truncate">
+                      {tr('Mundarija')}
+                    </span>
+                    <span className="text-[11px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 shrink-0">
+                      {headings.length} {tr("bo'lim")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-400">
+                    <span className="text-xs text-zinc-400 hidden sm:inline">
+                      {mobileTocOpen ? tr('Yopish') : tr('Ochish')}
+                    </span>
+                    {mobileTocOpen ? (
+                      <ChevronUp className="w-4 h-4 text-blue-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </div>
+                </button>
+
+                {mobileTocOpen && (
+                  <div className="px-5 pb-5 pt-1 border-t border-zinc-800/80 space-y-1.5 animate-in fade-in duration-200">
+                    {headings.map((h, idx) => {
+                      const isActive = activeHeadingId === h.id;
+                      return (
+                        <button
+                          key={h.id}
+                          type="button"
+                          onClick={() => {
+                            handleJumpToSection(h.id);
+                            setMobileTocOpen(false);
+                          }}
+                          className={`w-full text-left py-2 px-3 rounded-lg text-xs leading-relaxed transition-all flex items-start gap-2.5 cursor-pointer ${
+                            isActive
+                              ? 'bg-blue-600/15 text-blue-300 font-semibold border border-blue-500/30'
+                              : 'text-zinc-300 hover:text-white hover:bg-zinc-800/40'
+                          } ${h.level === 3 ? 'pl-6' : ''}`}
+                        >
+                          <span className="font-mono-tabular text-[10px] text-zinc-500 shrink-0 mt-0.5">
+                            {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}.
+                          </span>
+                          <span className="flex-1">{h.text}</span>
+                          {isActive && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 mt-1.5" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <MarkdownArticleContent
+              content={post.content}
+              alphabetMode={alphabetMode}
+              onJumpToSection={handleJumpToSection}
+            />
 
             {/* Unboxed Tags Footer */}
             {post.tags && post.tags.length > 0 && (
@@ -924,29 +1103,74 @@ ${post.content}
           <aside className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
             {headings.length > 0 && (
               <div className="p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 space-y-4">
-                <h2 className="font-display text-sm font-bold text-white">
-                  {tr('Maqola mundarijasi')}
-                </h2>
-                <nav aria-label={tr('Maqola mundarijasi')} className="space-y-2.5">
-                  {headings.map((h) => (
-                    <a
-                      key={h.id}
-                      href={`#${h.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const target = document.getElementById(h.id);
-                        if (target) {
-                          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                      }}
-                      className={`block text-xs leading-relaxed transition-colors hover:text-blue-400 ${
-                        h.level === 3 ? 'pl-3 text-zinc-400' : 'text-zinc-200 font-medium'
-                      }`}
-                    >
-                      {h.text}
-                    </a>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <List className="w-4 h-4 text-blue-400" />
+                    <h2 className="font-display text-sm font-bold text-white">
+                      {tr('Maqola mundarijasi')}
+                    </h2>
+                  </div>
+                  <span className="text-[11px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-800/80 text-zinc-400">
+                    {headings.length} {tr("bo'lim")}
+                  </span>
+                </div>
+
+                {/* Active Section Quick Tracker */}
+                {activeHeadingId && (
+                  <div className="px-3 py-2 rounded-lg bg-zinc-900/70 border border-zinc-800/80 text-[11px] text-zinc-400 flex items-center gap-2 truncate">
+                    <Compass className="w-3.5 h-3.5 text-blue-400 shrink-0 animate-pulse" />
+                    <span className="truncate">
+                      {headings.find((h) => h.id === activeHeadingId)?.text || tr("O'qilmoqda...")}
+                    </span>
+                  </div>
+                )}
+
+                <nav
+                  aria-label={tr('Maqola mundarijasi')}
+                  className="space-y-1 relative pl-2 border-l border-zinc-800"
+                >
+                  {headings.map((h, idx) => {
+                    const isActive = activeHeadingId === h.id;
+                    return (
+                      <button
+                        key={h.id}
+                        type="button"
+                        onClick={() => handleJumpToSection(h.id)}
+                        className={`group w-full text-left py-1.5 px-2 rounded-md text-xs leading-relaxed transition-all flex items-start gap-2 cursor-pointer relative ${
+                          isActive
+                            ? 'text-blue-400 font-semibold bg-blue-500/10'
+                            : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        } ${h.level === 3 ? 'pl-5 text-zinc-400' : ''}`}
+                      >
+                        {/* Active vertical pill indicator */}
+                        {isActive && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute -left-[9px] top-1.5 bottom-1.5 w-0.5 bg-blue-500 rounded-full"
+                          />
+                        )}
+                        <span className="font-mono-tabular text-[10px] text-zinc-500 shrink-0 mt-0.5 select-none">
+                          {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                        </span>
+                        <span className="flex-1 truncate">{h.text}</span>
+                      </button>
+                    );
+                  })}
                 </nav>
+
+                <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs">
+                  <button
+                    type="button"
+                    onClick={handleScrollToTop}
+                    className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5 text-blue-400" />
+                    <span>{tr('Boshiga qaytish')}</span>
+                  </button>
+                  <span className="text-[11px] text-zinc-500 font-mono-tabular">
+                    {Math.round(smoothProgress.get() * 100)}% {tr("o'qildi")}
+                  </span>
+                </div>
               </div>
             )}
 

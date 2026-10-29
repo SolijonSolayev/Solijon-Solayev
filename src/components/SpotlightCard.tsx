@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { soundEffects } from '../utils/soundEffects';
+import { triggerHaptic } from '../hooks/useHapticFeedback';
 
 interface SpotlightCardProps {
   children: React.ReactNode;
@@ -28,11 +29,13 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
     const now = Date.now();
     if (now - lastSoundTimeRef.current > 600) {
       soundEffects.playCyberGlitch();
+      triggerHaptic('glitch');
       lastSoundTimeRef.current = now;
     }
   };
 
   const handleClick = () => {
+    triggerHaptic('medium');
     if (onClick) {
       soundEffects.playClick();
       onClick();

@@ -5,8 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
       // In AI Studio environment, HMR WebSocket is disabled across the Cloud Run iframe proxy.
-      // Intercept and suppress benign Vite WebSocket disconnection events to keep error monitors clean.
+      // Intercept Vite HMR WebSocket so it stays in OPEN state and never triggers "WebSocket closed without opened"
       (function() {
+        if (typeof window === 'undefined') return;
+        const OrigWebSocket = window.WebSocket;
+        if (!OrigWebSocket) return;
+
+        function FakeHmrSocket(url, protocols) {
+          const emitter = new EventTarget();
+          let onopenHandler = null;
+          let oncloseHandler = null;
+          let onerrorHandler = null;
+          let onmessageHandler = null;
+
+          const fake = {
+            CONNECTING: 0,
+            OPEN: 1,
+            CLOSING: 2,
+            CLOSED: 3,
+            readyState: 1,
+            url: String(url),
+            protocol: 'vite-hmr',
+            extensions: '',
+            bufferedAmount: 0,
+            binaryType: 'blob',
+            send: function() {},
+            close: function(code, reason) {
+              fake.readyState = 3;
+              const ev = new CloseEvent('close', { code: code || 1000, reason: reason || '', wasClean: true });
+              if (oncloseHandler) oncloseHandler.call(fake, ev);
+              emitter.dispatchEvent(ev);
+            },
+            addEventListener: function(type, listener, options) {
+              emitter.addEventListener(type, listener, options);
+            },
+            removeEventListener: function(type, listener, options) {
+              emitter.removeEventListener(type, listener, options);
+            },
+            dispatchEvent: function(event) {
+              return emitter.dispatchEvent(event);
+            }
+          };
+
+          Object.defineProperty(fake, 'onopen', {
+            get: () => onopenHandler,
+            set: (fn) => {
+              if (onopenHandler) emitter.removeEventListener('open', onopenHandler);
+              onopenHandler = fn;
+              if (fn) emitter.addEventListener('open', fn);
+            }
+          });
+
+          Object.defineProperty(fake, 'onclose', {
+            get: () => oncloseHandler,
+            set: (fn) => {
+              if (oncloseHandler) emitter.removeEventListener('close', oncloseHandler);
+              oncloseHandler = fn;
+              if (fn) emitter.addEventListener('close', fn);
+            }
+          });
+
+          Object.defineProperty(fake, 'onerror', {
+            get: () => onerrorHandler,
+            set: (fn) => {
+              if (onerrorHandler) emitter.removeEventListener('error', onerrorHandler);
+              onerrorHandler = fn;
+              if (fn) emitter.addEventListener('error', fn);
+            }
+          });
+
+          Object.defineProperty(fake, 'onmessage', {
+            get: () => onmessageHandler,
+            set: (fn) => {
+              if (onmessageHandler) emitter.removeEventListener('message', onmessageHandler);
+              onmessageHandler = fn;
+              if (fn) emitter.addEventListener('message', fn);
+            }
+          });
+
+          queueMicrotask(() => {
+            const ev = new Event('open');
+            if (onopenHandler) onopenHandler.call(fake, ev);
+            emitter.dispatchEvent(ev);
+          });
+
+          return fake;
+        }
+
+        FakeHmrSocket.CONNECTING = 0;
+        FakeHmrSocket.OPEN = 1;
+        FakeHmrSocket.CLOSING = 2;
+        FakeHmrSocket.CLOSED = 3;
+
+        const PatchedWebSocket = function(url, protocols) {
+          if (
+            protocols === 'vite-hmr' ||
+            protocols === 'vite-ping' ||
+            (typeof url === 'string' && (url.indexOf('token=') !== -1 || url.indexOf('vite-hmr') !== -1 || url.indexOf('24678') !== -1))
+          ) {
+            return new FakeHmrSocket(url, protocols);
+          }
+          return new OrigWebSocket(url, protocols);
+        };
+
+        PatchedWebSocket.prototype = OrigWebSocket.prototype;
+        Object.assign(PatchedWebSocket, OrigWebSocket);
+        window.WebSocket = PatchedWebSocket;
+
         window.addEventListener('error', function(event) {
           if (
             event &&
@@ -18,6 +123,7 @@
             return true;
           }
         }, true);
+
         window.addEventListener('unhandledrejection', function(event) {
           if (event && event.reason && String(event.reason).indexOf('WebSocket') !== -1) {
             event.preventDefault();

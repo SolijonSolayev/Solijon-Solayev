@@ -578,3 +578,35 @@ html.dark .border-blue-500\/40 {
   }
 }
 
+/* Dynamic Table of Contents Highlight Flash */
+@keyframes headingFlashDark {
+  0% {
+    background-color: rgba(37, 99, 235, 0.28);
+    border-radius: 8px;
+    padding-left: 10px;
+  }
+  100% {
+    background-color: transparent;
+    padding-left: 0;
+  }
+}
+@keyframes headingFlashLight {
+  0% {
+    background-color: rgba(217, 119, 6, 0.24);
+    border-radius: 8px;
+    padding-left: 10px;
+  }
+  100% {
+    background-color: transparent;
+    padding-left: 0;
+  }
+}
+.heading-highlight-flash {
+  animation: headingFlashDark 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
+}
+html.light .heading-highlight-flash {
+  animation: headingFlashLight 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+

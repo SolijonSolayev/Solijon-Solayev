@@ -58,6 +58,7 @@ import { PortfolioChatbot } from './components/PortfolioChatbot';
 import { ProjectLightbox } from './components/ProjectLightbox';
 import { PWAInstallButton } from './components/PWAInstallButton';
 import { ParallaxImage, ParallaxLayer } from './components/ScrollParallax';
+import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { SeoHead } from './components/SeoHead';
 import { SpotlightCard } from './components/SpotlightCard';
 import { DEFAULT_PROFILE_DATA } from './data/defaultProfile';
@@ -87,6 +88,7 @@ import {
   localizeProfileForLanguage,
 } from './utils/i18n';
 import { soundEffects } from './utils/soundEffects';
+import { useHapticFeedback } from './hooks/useHapticFeedback';
 import { downloadVCard } from './utils/vcard';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
@@ -138,6 +140,7 @@ function resolveBlogIdentifierFromLocation(): string | null {
 
 export default function App() {
   const [rawProfile, setRawProfile] = useState<ProfileData>(DEFAULT_PROFILE_DATA);
+  const { triggerLight, triggerMedium, triggerSuccess, triggerSelection } = useHapticFeedback();
 
   // Supported Language state (uz / en)
   const [language, setLanguage] = useState<SupportedLanguage>(() => {
@@ -160,6 +163,7 @@ export default function App() {
   const handleLanguageChange = (lang: SupportedLanguage) => {
     setLanguage(lang);
     soundEffects.playChime();
+    triggerMedium();
     try {
       window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
       const url = new URL(window.location.href);
@@ -178,6 +182,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => soundEffects.isEnabled());
   const toggleSound = () => {
     const next = soundEffects.toggle();
+    triggerLight();
     setSoundEnabled(next);
   };
 
@@ -200,6 +205,7 @@ export default function App() {
 
   const handleAlphabetChange = (mode: UzbekAlphabetMode) => {
     soundEffects.playClick();
+    triggerSelection();
     setAlphabetMode(mode);
     try {
       window.localStorage.setItem(ALPHABET_STORAGE_KEY, mode);
@@ -249,6 +255,7 @@ export default function App() {
 
   const toggleThemeMode = () => {
     soundEffects.playChime();
+    triggerMedium();
     setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
@@ -306,6 +313,7 @@ export default function App() {
     setFlameCursorEnabled((prev) => {
       const next = !prev;
       soundEffects.playToggle(next);
+      triggerLight();
       try {
         window.localStorage.setItem('solijon_flame_cursor_enabled', String(next));
       } catch {
@@ -415,6 +423,7 @@ export default function App() {
 
   const navigateToPage = (page: ActiveSectionPage) => {
     soundEffects.playClick();
+    triggerSelection();
     setActiveBlogIdentifier(null);
     setActivePage(page);
     const nextHash = page === 'home' ? '#men-haqimda' : `#${page}`;
@@ -471,6 +480,7 @@ export default function App() {
 
   const openBlogPost = (post: BlogPostItem) => {
     soundEffects.playClick();
+    triggerSelection();
     const slugOrId = post.slug || post.id;
     try {
       const url = new URL(window.location.href);
@@ -487,6 +497,7 @@ export default function App() {
 
   const closeBlogPost = () => {
     soundEffects.playClick();
+    triggerSelection();
     try {
       const url = new URL(window.location.href);
       url.searchParams.delete('article');
@@ -558,6 +569,7 @@ export default function App() {
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(profile.personal.email);
     soundEffects.playSuccess();
+    triggerSuccess();
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -574,6 +586,7 @@ export default function App() {
         message: senderMessage || `${senderProjectType} bo'yicha murojaat`,
       });
       soundEffects.playSuccess();
+      triggerSuccess();
       setInquirySubmitted(true);
     } finally {
       setIsSendingInquiry(false);
@@ -583,6 +596,7 @@ export default function App() {
   if (isAdminRoute) {
     return (
       <>
+        <ScrollProgressBar themeMode={themeMode} />
         <FlameCursor enabled={flameCursorEnabled} />
         <AdminPanelView
           currentUser={currentUser}
@@ -601,6 +615,7 @@ export default function App() {
   if (activeBlogPost) {
     return (
       <>
+        <ScrollProgressBar themeMode={themeMode} />
         <FlameCursor enabled={flameCursorEnabled} />
         <SeoHead
           rawProfile={rawProfile}
@@ -661,6 +676,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col relative selection:bg-blue-600/30 selection:text-white">
+      <ScrollProgressBar themeMode={themeMode} />
       <OfflineIndicator lang={language} alphabetMode={alphabetMode} />
       <FlameCursor enabled={flameCursorEnabled} />
       <SeoHead
@@ -880,6 +896,7 @@ export default function App() {
             type="button"
             onClick={() => {
               soundEffects.playClick();
+              triggerMedium();
               setIsCardModalOpen(true);
             }}
             className="px-3.5 sm:px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-blue-600/20"
@@ -1211,6 +1228,7 @@ export default function App() {
                 type="button"
                 onClick={() => {
                   soundEffects.playSuccess();
+                  triggerSuccess();
                   downloadVCard(profile);
                 }}
                 className="px-3.5 py-2 text-xs font-medium text-zinc-200 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"

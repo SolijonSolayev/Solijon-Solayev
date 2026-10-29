@@ -699,7 +699,7 @@ export default function App() {
       />
 
       {/* 3-Zone Top Bar Contract */}
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-6 lg:px-12 py-3 sm:py-3.5 bg-[#050505]/85 backdrop-blur-xl border-b border-zinc-800/80 max-w-full overflow-hidden">
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 bg-[#050505]/90 backdrop-blur-xl border-b border-zinc-800/80 max-w-full overflow-hidden">
         {/* Zone 1: Single text element wordmark */}
         <a
           href="#men-haqimda"
@@ -707,7 +707,7 @@ export default function App() {
             e.preventDefault();
             navigateToPage('home');
           }}
-          className="font-display text-base sm:text-lg font-bold tracking-tight text-white hover:text-blue-400 transition-colors whitespace-nowrap shrink-0 truncate max-w-[130px] xs:max-w-[170px] sm:max-w-none"
+          className="font-display text-sm sm:text-lg font-bold tracking-tight text-white hover:text-blue-400 transition-colors whitespace-nowrap shrink-0 truncate max-w-[120px] xs:max-w-[150px] sm:max-w-none"
         >
           {personal.fullName}
         </a>
@@ -795,9 +795,11 @@ export default function App() {
         </nav>
 
         {/* Zone 3: PWA Install, Audio FX, Language Switcher, Theme, Flame & Primary Action */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0 max-w-full overflow-x-auto no-scrollbar py-0.5">
-          {/* PWA Install Button */}
-          <PWAInstallButton lang={language} alphabetMode={alphabetMode} />
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* PWA Install Button (desktop & tablet) */}
+          <div className="hidden sm:inline-flex">
+            <PWAInstallButton lang={language} alphabetMode={alphabetMode} />
+          </div>
 
           {/* Sound FX Haptic Synthesizer Toggle */}
           <button
@@ -809,7 +811,7 @@ export default function App() {
                 : getTranslation('soundUnmute', language, alphabetMode)
             }
             aria-label={soundEnabled ? 'Mute audio' : 'Enable audio'}
-            className={`px-2.5 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`hidden sm:inline-flex px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border transition-all items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               soundEnabled
                 ? 'bg-blue-600/15 border-blue-500/40 text-blue-300 hover:bg-blue-600/25'
                 : 'bg-[#0F0F12] border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
@@ -829,7 +831,7 @@ export default function App() {
             onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
             title={language === 'uz' ? 'Switch interface to English' : "Interfeysni o'zbek tiliga o'tkazish"}
             aria-label="Language Switcher"
-            className="px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5 text-blue-400" />
             <span className="font-semibold">{language === 'uz' ? 'OʻZ' : 'EN'}</span>
@@ -849,7 +851,7 @@ export default function App() {
                 ? getTranslation('dayMode', language, alphabetMode)
                 : getTranslation('nightMode', language, alphabetMode)
             }
-            className={`px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
               themeMode === 'light'
                 ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
                 : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
@@ -868,7 +870,7 @@ export default function App() {
             )}
           </button>
 
-          {/* Interactive Flame Cursor Toggle */}
+          {/* Interactive Flame Cursor Toggle (large screens) */}
           <button
             type="button"
             onClick={toggleFlameCursor}
@@ -878,7 +880,7 @@ export default function App() {
                 : getTranslation('flameCursorEnable', language, alphabetMode)
             }
             aria-pressed={flameCursorEnabled}
-            className={`px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`hidden lg:inline-flex px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border transition-all items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               flameCursorEnabled
                 ? 'bg-orange-500/15 border-orange-500/50 text-orange-300 shadow-sm shadow-orange-500/20 hover:bg-orange-500/25'
                 : 'bg-[#0F0F12] border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
@@ -889,7 +891,7 @@ export default function App() {
                 flameCursorEnabled ? 'text-orange-400 animate-pulse' : 'text-zinc-500'
               }`}
             />
-            <span className="hidden lg:inline">{getTranslation('flameCursor', language, alphabetMode)}</span>
+            <span>{getTranslation('flameCursor', language, alphabetMode)}</span>
           </button>
 
           <motion.button
@@ -901,7 +903,7 @@ export default function App() {
               triggerMedium();
               setIsCardModalOpen(true);
             }}
-            className="px-3.5 sm:px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-blue-600/20"
+            className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-blue-600/20"
           >
             {getTranslation('digitalCard', language, alphabetMode)}
           </motion.button>
@@ -910,7 +912,7 @@ export default function App() {
 
       <main id="top" className="flex-1 relative z-10">
         {/* Mobile & Sub-page Quick Navigation Bar */}
-        <div className="md:hidden border-b border-zinc-800/80 bg-[#0A0A0D]/90 px-4 py-2.5 overflow-x-auto">
+        <div className="md:hidden border-b border-zinc-800/80 bg-[#0A0A0D]/95 backdrop-blur-md px-3 py-2 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1.5 w-max">
             {(
               [
@@ -927,7 +929,7 @@ export default function App() {
                 onClick={() => navigateToPage(tab.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   activePage === tab.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-white font-semibold'
                     : 'text-zinc-400 hover:text-white bg-[#0F0F12] border border-zinc-800'
                 }`}
               >
@@ -937,11 +939,15 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
-              className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-[#0F0F12] border border-zinc-800 text-blue-400 cursor-pointer inline-flex items-center gap-1"
+              onClick={() => {
+                soundEffects.playClick();
+                setIsCommandPaletteOpen(true);
+              }}
+              title={language === 'en' ? 'Quick search' : tr('Tezkor qidiruv')}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer inline-flex items-center gap-1"
             >
-              <Globe className="w-3.5 h-3.5 text-blue-400" />
-              <span>{language === 'uz' ? 'OʻZ' : 'EN'}</span>
+              <Search className="w-3.5 h-3.5 text-blue-400" />
+              <span>{getTranslation('search', language, alphabetMode)}</span>
             </button>
 
             <button
@@ -959,20 +965,11 @@ export default function App() {
 
             <button
               type="button"
-              onClick={toggleThemeMode}
-              title={themeMode === 'dark' ? tr("Kunduzgi hashamatli rejim") : tr("Tungi rejim")}
-              className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer inline-flex items-center gap-1 border ${
-                themeMode === 'light'
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-900'
-                  : 'text-zinc-400 hover:text-white bg-[#0F0F12] border-zinc-800'
-              }`}
+              onClick={toggleFlameCursor}
+              title={flameCursorEnabled ? 'Disable Flame' : 'Enable Flame'}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer inline-flex items-center gap-1"
             >
-              {themeMode === 'dark' ? (
-                <Sun className="w-3.5 h-3.5 text-amber-400" />
-              ) : (
-                <Moon className="w-3.5 h-3.5 text-amber-700" />
-              )}
-              <span>{themeMode === 'dark' ? tr('Kun') : tr('Tun')}</span>
+              <Flame className={`w-3.5 h-3.5 ${flameCursorEnabled ? 'text-orange-400' : 'text-zinc-500'}`} />
             </button>
           </div>
         </div>
@@ -1465,14 +1462,53 @@ export default function App() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pt-10 border-t border-zinc-800/80 will-change-transform"
           >
             {profile.metrics.map((item, idx) => {
-              const icons = [
-                <Briefcase key="0" className="w-5 h-5 text-blue-400" />,
-                <Layers key="1" className="w-5 h-5 text-blue-400" />,
-                <Globe key="2" className="w-5 h-5 text-blue-400" />,
-                <Code2 key="3" className="w-5 h-5 text-blue-400" />,
-              ];
-              const categories = [tr('Tajriba'), tr('Loyihalar'), tr('Viki-Faoliyat'), tr('Ochiq Kod')];
-              const badges = ['3+ Yil', 'Full-Stack', 'CC BY-SA', 'Open-Source'];
+              const metaMap: Record<
+                string,
+                {
+                  icon: React.ReactNode;
+                  category: string;
+                  badge: string;
+                  actionText?: string;
+                  onClick?: () => void;
+                }
+              > = {
+                m1: {
+                  icon: <Sparkles className="w-5 h-5 text-blue-400" />,
+                  category: tr('Astronomiya · 3D'),
+                  badge: 'solaris3d.uz',
+                  actionText: tr('solaris3d.uz ga oʻtish'),
+                  onClick: () => window.open('https://solaris3d.uz', '_blank', 'noopener,noreferrer'),
+                },
+                m2: {
+                  icon: <BookOpen className="w-5 h-5 text-blue-400" />,
+                  category: tr('Oʻzbek Tili · Imlo'),
+                  badge: 'tilimlo.uz',
+                  actionText: tr('tilimlo.uz ga oʻtish'),
+                  onClick: () => window.open('https://tilimlo.uz', '_blank', 'noopener,noreferrer'),
+                },
+                m3: {
+                  icon: <Code2 className="w-5 h-5 text-blue-400" />,
+                  category: tr('Ochiq Kodli Dasturlar'),
+                  badge: 'GitHub',
+                  actionText: tr('Dasturlarni koʻrish'),
+                  onClick: () => navigateToPage('loyihalar'),
+                },
+                m4: {
+                  icon: <Globe className="w-5 h-5 text-blue-400" />,
+                  category: tr('Erkin Bilim & Media'),
+                  badge: 'Viki-Faoliyat',
+                  actionText: tr('Ekotizimni koʻrish'),
+                  onClick: () => navigateToPage('tajriba'),
+                },
+              };
+
+              const currentMeta = metaMap[item.id] || {
+                icon: <Code2 className="w-5 h-5 text-blue-400" />,
+                category: tr('Faoliyat'),
+                badge: 'IT Portfolio',
+                actionText: undefined,
+                onClick: undefined,
+              };
 
               return (
                 <Card10
@@ -1480,14 +1516,11 @@ export default function App() {
                   title={item.label}
                   value={item.value}
                   description={item.context}
-                  category={categories[idx % categories.length]}
-                  badge={badges[idx % badges.length]}
-                  icon={icons[idx % icons.length]}
-                  onClick={() => {
-                    if (idx === 1) navigateToPage('loyihalar');
-                    if (idx === 2) navigateToPage('tajriba');
-                  }}
-                  actionText={idx === 1 ? tr('Loyihalarni koʻrish') : idx === 2 ? tr('Faoliyatni koʻrish') : undefined}
+                  category={currentMeta.category}
+                  badge={currentMeta.badge}
+                  icon={currentMeta.icon}
+                  onClick={currentMeta.onClick}
+                  actionText={currentMeta.actionText}
                 />
               );
             })}
@@ -1560,7 +1593,7 @@ export default function App() {
                   value={project.impactMetric}
                   description={project.summary}
                   category={project.category}
-                  badge={project.year}
+                  badge={project.year === '2025' ? '2026' : project.year}
                   imageUrl={project.imageUrl}
                   subMetrics={project.technologies.slice(0, 2).map((t) => ({ label: tr('Texnologiya'), value: t }))}
                   actionText={tr('Toʻliq tafsilotlar')}
@@ -1665,11 +1698,11 @@ export default function App() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card10
-                title={tr('Tajriba va Xronologiya')}
-                value={profile.experience[0]?.period || '2023 - Hozirgacha'}
-                description={profile.experience[0]?.description || tr('Professional dasturlash va ochiq kodli loyihalar')}
-                category={tr('Xronologiya')}
-                badge="3+ Yil"
+                title={tr('Faoliyat va Tajriba')}
+                value={profile.experience[0]?.period || tr('Hozirgi vaqtda')}
+                description={profile.experience[0]?.description || tr('Mustaqil veb va ochiq kodli loyihalar')}
+                category={tr('Faoliyat')}
+                badge={tr('Amaliy tajriba')}
                 subMetrics={profile.experience.slice(0, 2).map((exp) => ({ label: exp.company, value: exp.role }))}
                 actionText={tr("To'liq faoliyat xronologiyasi")}
                 onClick={() => navigateToPage('tajriba')}
@@ -1678,11 +1711,11 @@ export default function App() {
               <Card10
                 title={tr("Texnik Stack & Ekotizim")}
                 value="React · TypeScript · Python"
-                description={tr("Frontend arxitektura, Python/PowerShell tizim avtomatizatsiyasi va Vikipediya erkin bilim ulashish faoliyati.")}
+                description={tr("Frontend arxitektura, tizim avtomatizatsiyasi va Vikipediya erkin bilim ulashish faoliyati.")}
                 category={tr('Texnologiyalar')}
-                badge="Full-Stack"
+                badge={tr('Frontend & IT')}
                 subMetrics={[
-                  { label: 'Platforma', value: 'Solaris 3D / Tilimlo' },
+                  { label: 'Platforma', value: 'Solaris 3D · Tilimlo' },
                   { label: 'Ochiq Kod', value: 'GitHub & Vikiombor' },
                 ]}
                 actionText={tr("Jonli ekotizim va tajribani ko'rish")}
@@ -1889,7 +1922,7 @@ export default function App() {
                         value={project.impactMetric}
                         description={project.summary}
                         category={project.category}
-                        badge={`${project.year} · ${project.client}`}
+                        badge={`${project.year === '2025' ? '2026' : project.year} · ${project.client}`}
                         imageUrl={project.imageUrl}
                         subMetrics={project.technologies.slice(0, 4).map((tech) => ({
                           label: 'Tech',

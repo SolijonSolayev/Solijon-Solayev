@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Solijon Solayev — Shaxsiy Blog va IT Maqolalar («Fikr qilamiz»)</title>
-    <link>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog</link>
+    <link>https://solijonsolayev.github.io/#blog</link>
     <description>Solijon Solayevning dasturlash, Solaris 3D (solaris3d.uz) jonli astronomiya observatoriyasi, Tilimlo.uz o'zbek tili imlosi, ochiq kodli dasturlar hamda O'zbekcha Vikipediya va Vikiombor (Wikimedia Commons) tasodifiy fotogalereyasi haqidagi shaxsiy blogi (2026-yilgi yangilangan Ö, Ğ, Ş, Ç va amaldagi Oʻ, Gʻ, Sh, Ch alifbolarida).</description>
     <language>uz</language>
     <lastBuildDate>Thu, 29 Oct 2026 12:00:00 +0500</lastBuildDate>
-    <atom:link href="https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://solijonsolayev.github.io/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Solaris 3D (solaris3d.uz): Veb-brauzerda real vaqt rejimida 3D astronomiya va kosmik observatoriya yaratish tajribasi</title>
-      <link>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/solaris-3d-jonli-astronomiya-observatoriya</link>
-      <guid>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/solaris-3d-jonli-astronomiya-observatoriya</guid>
+      <link>https://solijonsolayev.github.io/?article=solaris-3d-jonli-astronomiya-observatoriya</link>
+      <guid>https://solijonsolayev.github.io/?article=solaris-3d-jonli-astronomiya-observatoriya</guid>
       <pubDate>Sun, 15 Mar 2026 10:00:00 +0500</pubDate>
       <category>Astronomiya va Fan</category>
       <description>Osmon sirlari, quyosh tutilishi, sayyoralar harakati va osmon sferasini o'zbek tilida interaktiv 3D WebGL simulyatsiya orqali kuzatish imkonini beruvchi Solaris 3D platformasining texnik arxitekturasi haqida. (Solaris 3D — Quyoş tizimi va sayyoralarni 3D formatda kuzatiş).</description>
     </item>
     <item>
       <title>Tilimlo.uz va yangilangan o'zbek lotin alifbosi: Raqamli savodxonlikda yangi bosqich</title>
-      <link>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/tilimlo-uz-va-yangilangan-ozbek-alifbosi</link>
-      <guid>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/tilimlo-uz-va-yangilangan-ozbek-alifbosi</guid>
+      <link>https://solijonsolayev.github.io/?article=tilimlo-uz-va-yangilangan-ozbek-alifbosi</link>
+      <guid>https://solijonsolayev.github.io/?article=tilimlo-uz-va-yangilangan-ozbek-alifbosi</guid>
       <pubDate>Sat, 28 Feb 2026 10:00:00 +0500</pubDate>
       <category>O'zbek tili va Imlo</category>
       <description>O'zbek tilida bexato yozish, elektron matnlar tahlili, Tilimlo.uz platformasining yaratilish tarixi hamda diakritik harflar (Ö, Ğ, Ş, Ç) bilan ishlashning texnik jihatlari.</description>
     </item>
     <item>
       <title>Linux, Windows va macOS uchun ochiq kodli tizim vositalari: usb-formatter va AqlliTozalash</title>
-      <link>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/linux-windows-macos-uchun-ochiq-kodli-vositalar</link>
-      <guid>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/linux-windows-macos-uchun-ochiq-kodli-vositalar</guid>
+      <link>https://solijonsolayev.github.io/?article=linux-windows-macos-uchun-ochiq-kodli-vositalar</link>
+      <guid>https://solijonsolayev.github.io/?article=linux-windows-macos-uchun-ochiq-kodli-vositalar</guid>
       <pubDate>Mon, 19 Jan 2026 10:00:00 +0500</pubDate>
       <category>Dasturlash va IT</category>
       <description>Kundalik kompyuter foydalanuvchilari va dasturchilar uchun yaratilgan usb-formatter hamda AqlliTozalash kross-platforma dasturlarining ishlash tamoyili.</description>
     </item>
     <item>
       <title>Fikr qilamiz: O'zbekcha Vikipediya, Vikiombor va erkin bilimlar ekotizimiga hissa qo'shish nima uchun muhim?</title>
-      <link>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/ozbekcha-vikipediya-vikiombor-va-erkin-bilim</link>
-      <guid>https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/#blog/ozbekcha-vikipediya-vikiombor-va-erkin-bilim</guid>
+      <link>https://solijonsolayev.github.io/?article=ozbekcha-vikipediya-vikiombor-va-erkin-bilim</link>
+      <guid>https://solijonsolayev.github.io/?article=ozbekcha-vikipediya-vikiombor-va-erkin-bilim</guid>
       <pubDate>Wed, 10 Dec 2025 10:00:00 +0500</pubDate>
       <category>Shaxsiy fikrlar</category>
       <description>O'zbek tilidagi sifatli ilmiy-ensiklopedik maqolalar, Wikimedia Commons (Vikiombor) erkin media bazasi uchun mualliflik fotografiyasi va tasodifiy fotogalereya hamda YouTube va Telegramda foydali kontent yaratish haqida mulohazalar.</description>

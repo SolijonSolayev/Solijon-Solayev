@@ -37,5 +37,6 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Host: https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app
-Sitemap: https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/sitemap.xml
+Host: https://solijonsolayev.github.io
+Sitemap: https://solijonsolayev.github.io/sitemap.xml
+Sitemap: /sitemap.xml

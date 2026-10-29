@@ -1,8 +1,10 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { TrendingUp, TrendingDown, Sparkles, ArrowUpRight, Layers } from 'lucide-react';
+import { soundEffects } from '@/src/utils/soundEffects';
+import { triggerHaptic } from '@/src/hooks/useHapticFeedback';
 
 export interface Card10Props {
   title: string;
@@ -38,12 +40,31 @@ export const Card10: React.FC<Card10Props> = ({
   actionText,
 }) => {
   const [imgFailed, setImgFailed] = useState(false);
+  const lastSoundTimeRef = useRef<number>(0);
+
+  const handleMouseEnter = () => {
+    const now = Date.now();
+    if (now - lastSoundTimeRef.current > 400) {
+      soundEffects.playClick();
+      triggerHaptic('light');
+      lastSoundTimeRef.current = now;
+    }
+  };
+
+  const handleClick = () => {
+    soundEffects.playClick();
+    triggerHaptic('medium');
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
     <motion.div
       whileHover={{ y: -3, scale: 1.01 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      onClick={onClick}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
       className={`group relative rounded-2xl bg-[#0F0F12] border border-zinc-800/90 overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-600/10 ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}

@@ -1,0 +1,6 @@
+{
+  "name": "Solijon Solayev — Shaxsiy Vizitka va IT Portfolio",
+  "description": "Solijon Solayevning shaxsiy raqamli vizitkasi, IT portfeli (Solaris 3D, Tilimlo.uz), shaxsiy blogi, Vikipediya va Vikiombor jonli ekotizimi hamda ikki alifboli (Ö, Ğ, Ş, Ç va Oʻ, Gʻ, Sh, Ch) veb-platformasi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

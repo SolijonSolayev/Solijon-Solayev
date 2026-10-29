@@ -1,0 +1,281 @@
+{
+  "entities": {
+    "PortfolioProfile": {
+      "title": "PortfolioProfile",
+      "description": "Public portfolio and digital business card content managed exclusively by Solijon Solayev.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "description": "UID of the admin who last updated the portfolio.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name displayed on the business card.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "role": {
+          "type": "string",
+          "description": "Professional title and role.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "kicker": {
+          "type": "string",
+          "description": "Hero kicker line.",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "headline": {
+          "type": "string",
+          "description": "Main hero headline.",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "shortBio": {
+          "type": "string",
+          "description": "Short biography summary.",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "detailedBio": {
+          "type": "string",
+          "description": "Detailed biography paragraph.",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "location": {
+          "type": "string",
+          "description": "City and country location.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "availability": {
+          "type": "string",
+          "description": "Current work availability status.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "publicEmail": {
+          "type": "string",
+          "description": "Public business contact email.",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "publicPhone": {
+          "type": "string",
+          "description": "Public business contact phone or contact note.",
+          "minLength": 3,
+          "maxLength": 80
+        },
+        "telegram": {
+          "type": "string",
+          "description": "Telegram link.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "github": {
+          "type": "string",
+          "description": "GitHub profile link.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "linkedin": {
+          "type": "string",
+          "description": "LinkedIn profile link.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "website": {
+          "type": "string",
+          "description": "Personal website URL.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "youtube": {
+          "type": "string",
+          "description": "YouTube channel URL.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "wikipedia": {
+          "type": "string",
+          "description": "Uzbek Wikipedia user page URL.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "commons": {
+          "type": "string",
+          "description": "Wikimedia Commons user page URL.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "taplink": {
+          "type": "string",
+          "description": "Taplink URL.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "etiquetteNote": {
+          "type": "string",
+          "description": "Communication etiquette note.",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "heroImageUrl": {
+          "type": "string",
+          "description": "Hero showcase image path or URL.",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "yearsOfExperience": {
+          "type": "string",
+          "description": "Birth year or experience label.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "metrics": {
+          "type": "array",
+          "description": "Bounded list of up to 10 KPI metric objects."
+        },
+        "services": {
+          "type": "array",
+          "description": "Bounded list of up to 10 service objects."
+        },
+        "skillGroups": {
+          "type": "array",
+          "description": "Bounded list of up to 10 skill group objects."
+        },
+        "projects": {
+          "type": "array",
+          "description": "Bounded list of up to 20 portfolio project objects."
+        },
+        "experience": {
+          "type": "array",
+          "description": "Bounded list of up to 20 CV experience/education objects."
+        },
+        "blogPosts": {
+          "type": "array",
+          "description": "Bounded list of up to 30 personal blog post objects."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last update."
+        }
+      },
+      "required": [
+        "ownerUid",
+        "fullName",
+        "role",
+        "kicker",
+        "headline",
+        "shortBio",
+        "detailedBio",
+        "location",
+        "availability",
+        "publicEmail",
+        "publicPhone",
+        "telegram",
+        "github",
+        "linkedin",
+        "website",
+        "youtube",
+        "wikipedia",
+        "commons",
+        "taplink",
+        "etiquetteNote",
+        "heroImageUrl",
+        "yearsOfExperience",
+        "metrics",
+        "services",
+        "skillGroups",
+        "projects",
+        "experience",
+        "blogPosts",
+        "updatedAt"
+      ]
+    },
+    "ContactInquiry": {
+      "title": "ContactInquiry",
+      "description": "Client project inquiry message sent from the public contact form and viewable only in the Admin Panel.",
+      "type": "object",
+      "properties": {
+        "senderName": {
+          "type": "string",
+          "description": "Name of the client or company.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "senderContact": {
+          "type": "string",
+          "description": "Phone number, email, or Telegram username of the sender.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "projectType": {
+          "type": "string",
+          "description": "Selected project category.",
+          "enum": ["Veb-ilova / SaaS", "Backend & API", "UI/UX & Mobil", "Texnik Konsalting"],
+          "maxLength": 80
+        },
+        "message": {
+          "type": "string",
+          "description": "Inquiry message details.",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "description": "Workflow status of the inquiry.",
+          "enum": ["new", "read", "archived"],
+          "maxLength": 20
+        },
+        "recipientEmail": {
+          "type": "string",
+          "description": "Owner email for query enforcement.",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp."
+        }
+      },
+      "required": [
+        "senderName",
+        "senderContact",
+        "projectType",
+        "message",
+        "status",
+        "recipientEmail",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/portfolio/{docId}": {
+      "schema": {
+        "$ref": "#/entities/PortfolioProfile"
+      },
+      "description": "Stores the public portfolio document readable by visitors and writable only by the verified admin."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": {
+        "$ref": "#/entities/ContactInquiry"
+      },
+      "description": "Stores client contact inquiries submitted from the public site and managed by the admin in the Admin Panel."
+    }
+  }
+}

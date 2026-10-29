@@ -1,0 +1,248 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 0: Global Safety Net (Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedAdmin() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'solijonsolayev2003@gmail.com';
+    }
+
+    function isAdmin() {
+      return isVerifiedAdmin()
+        || (isSignedIn()
+            && request.auth.token.email_verified == true
+            && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidPortfolioProfile(data) {
+      return data.keys().hasAll([
+          'ownerUid',
+          'fullName',
+          'role',
+          'kicker',
+          'headline',
+          'shortBio',
+          'detailedBio',
+          'location',
+          'availability',
+          'publicEmail',
+          'publicPhone',
+          'telegram',
+          'github',
+          'linkedin',
+          'website',
+          'youtube',
+          'wikipedia',
+          'commons',
+          'taplink',
+          'etiquetteNote',
+          'heroImageUrl',
+          'yearsOfExperience',
+          'metrics',
+          'services',
+          'skillGroups',
+          'projects',
+          'experience',
+          'blogPosts',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerUid',
+          'fullName',
+          'role',
+          'kicker',
+          'headline',
+          'shortBio',
+          'detailedBio',
+          'location',
+          'availability',
+          'publicEmail',
+          'publicPhone',
+          'telegram',
+          'github',
+          'linkedin',
+          'website',
+          'youtube',
+          'wikipedia',
+          'commons',
+          'taplink',
+          'etiquetteNote',
+          'heroImageUrl',
+          'yearsOfExperience',
+          'metrics',
+          'services',
+          'skillGroups',
+          'projects',
+          'experience',
+          'blogPosts',
+          'updatedAt'
+        ])
+        && data.ownerUid is string
+        && data.ownerUid.size() >= 1
+        && data.ownerUid.size() <= 128
+        && data.ownerUid.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.ownerUid == request.auth.uid
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 120
+        && data.role is string && data.role.size() >= 1 && data.role.size() <= 160
+        && data.kicker is string && data.kicker.size() >= 1 && data.kicker.size() <= 240
+        && data.headline is string && data.headline.size() >= 1 && data.headline.size() <= 300
+        && data.shortBio is string && data.shortBio.size() >= 1 && data.shortBio.size() <= 1000
+        && data.detailedBio is string && data.detailedBio.size() >= 1 && data.detailedBio.size() <= 2000
+        && data.location is string && data.location.size() >= 1 && data.location.size() <= 120
+        && data.availability is string && data.availability.size() >= 1 && data.availability.size() <= 160
+        && data.publicEmail is string && data.publicEmail.size() >= 3 && data.publicEmail.size() <= 160
+        && data.publicPhone is string && data.publicPhone.size() >= 3 && data.publicPhone.size() <= 80
+        && data.telegram is string && data.telegram.size() >= 1 && data.telegram.size() <= 200
+        && data.github is string && data.github.size() >= 1 && data.github.size() <= 200
+        && data.linkedin is string && data.linkedin.size() >= 1 && data.linkedin.size() <= 200
+        && data.website is string && data.website.size() >= 1 && data.website.size() <= 200
+        && data.youtube is string && data.youtube.size() >= 1 && data.youtube.size() <= 200
+        && data.wikipedia is string && data.wikipedia.size() >= 1 && data.wikipedia.size() <= 200
+        && data.commons is string && data.commons.size() >= 1 && data.commons.size() <= 200
+        && data.taplink is string && data.taplink.size() >= 1 && data.taplink.size() <= 200
+        && data.etiquetteNote is string && data.etiquetteNote.size() >= 1 && data.etiquetteNote.size() <= 500
+        && data.heroImageUrl is string && data.heroImageUrl.size() >= 1 && data.heroImageUrl.size() <= 500
+        && data.yearsOfExperience is string && data.yearsOfExperience.size() >= 1 && data.yearsOfExperience.size() <= 60
+        && data.metrics is list && data.metrics.size() <= 10 && (data.metrics.size() == 0 || data.metrics[0] is map)
+        && data.services is list && data.services.size() <= 10 && (data.services.size() == 0 || data.services[0] is map)
+        && data.skillGroups is list && data.skillGroups.size() <= 10 && (data.skillGroups.size() == 0 || data.skillGroups[0] is map)
+        && data.projects is list && data.projects.size() <= 20 && (data.projects.size() == 0 || data.projects[0] is map)
+        && data.experience is list && data.experience.size() <= 20 && (data.experience.size() == 0 || data.experience[0] is map)
+        && data.blogPosts is list && data.blogPosts.size() <= 30 && (data.blogPosts.size() == 0 || data.blogPosts[0] is map)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidContactInquiry(data) {
+      return data.keys().hasAll([
+          'senderName',
+          'senderContact',
+          'projectType',
+          'message',
+          'status',
+          'recipientEmail',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'senderName',
+          'senderContact',
+          'projectType',
+          'message',
+          'status',
+          'recipientEmail',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 120
+        && data.senderContact is string && data.senderContact.size() >= 1 && data.senderContact.size() <= 160
+        && data.projectType is string && data.projectType.size() <= 80
+        && data.projectType in ['Veb-ilova / SaaS', 'Backend & API', 'UI/UX & Mobil', 'Texnik Konsalting']
+        && data.message is string && data.message.size() >= 1 && data.message.size() <= 2000
+        && data.status is string && data.status.size() <= 20
+        && data.status in ['new', 'read', 'archived']
+        && data.recipientEmail is string && data.recipientEmail.size() >= 3 && data.recipientEmail.size() <= 160
+        && data.recipientEmail == 'solijonsolayev2003@gmail.com'
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && request.auth.uid == adminId;
+      allow list, create, update, delete: if false;
+    }
+
+    match /portfolio/{docId} {
+      allow get: if isValidId(docId);
+      allow list: if false;
+      allow create: if isSignedIn()
+        && isValidId(docId)
+        && isValidPortfolioProfile(incoming())
+        && incoming().updatedAt == request.time
+        && isAdmin();
+      allow update: if isSignedIn()
+        && isValidId(docId)
+        && isValidPortfolioProfile(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'ownerUid',
+          'fullName',
+          'role',
+          'kicker',
+          'headline',
+          'shortBio',
+          'detailedBio',
+          'location',
+          'availability',
+          'publicEmail',
+          'publicPhone',
+          'telegram',
+          'github',
+          'linkedin',
+          'website',
+          'youtube',
+          'wikipedia',
+          'commons',
+          'taplink',
+          'etiquetteNote',
+          'heroImageUrl',
+          'yearsOfExperience',
+          'metrics',
+          'services',
+          'skillGroups',
+          'projects',
+          'experience',
+          'blogPosts',
+          'updatedAt'
+        ])
+        && isAdmin();
+      allow delete: if false;
+    }
+
+    match /inquiries/{inquiryId} {
+      allow get: if isSignedIn() && isValidId(inquiryId) && isAdmin();
+      allow list: if isVerifiedAdmin() && resource.data.recipientEmail == 'solijonsolayev2003@gmail.com';
+      allow create: if isValidId(inquiryId)
+        && isValidContactInquiry(incoming())
+        && incoming().status == 'new'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(inquiryId)
+        && isValidContactInquiry(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().createdAt == existing().createdAt
+        && incoming().senderName == existing().senderName
+        && incoming().senderContact == existing().senderContact
+        && incoming().projectType == existing().projectType
+        && incoming().message == existing().message
+        && incoming().recipientEmail == existing().recipientEmail
+        && (existing().status != 'archived' || isAdmin())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && isAdmin();
+      allow delete: if isSignedIn() && isValidId(inquiryId) && isAdmin();
+    }
+  }
+}

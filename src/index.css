@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #050505;
+    --surface: #0F0F12;
+    --border: #27272A;
+    --primary: #2563EB;
+    --accent: #3B82F6;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #050505;
+    color: #F4F4F5;
+    letter-spacing: 0.01em;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .font-mono-tabular {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Subtle architectural grid background */
+.bg-architectural-grid {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+}
+
+.mask-radial-fade {
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 25%, #000 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 25%, #000 45%, transparent 100%);
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-slow {
+  animation: subtleFloat 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee,
+  .animate-float-slow {
+    animation: none;
+  }
+}
+
+/* Flame Breathing Cursor — hide native pointer on desktop when active */
+@media (pointer: fine) {
+  body.flame-cursor-enabled,
+  body.flame-cursor-enabled * {
+    cursor: none !important;
+  }
+}
+

@@ -1,0 +1,41 @@
+# robots.txt — Solijon Solayev Shaxsiy Vizitka, IT Portfolio, Blog va Jonli Ekotizim
+# Supports Google, Yandex, Bing, DuckDuckGo, and AI Search Engines (llms.txt, rss.xml, sitemap.xml)
+
+User-agent: *
+Allow: /
+Allow: /sitemap.xml
+Allow: /rss.xml
+Allow: /llms.txt
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+
+User-agent: Yandex
+Allow: /
+Disallow: /api/
+Clean-param: ref&utm_source&utm_medium&utm_campaign /
+
+User-agent: YandexBot
+Allow: /
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Host: https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app
+Sitemap: https://ais-pre-7ai3g7nhd62wmehezxg6yz-89349663844.asia-southeast1.run.app/sitemap.xml

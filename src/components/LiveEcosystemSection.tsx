@@ -11,9 +11,11 @@ import {
   FileText,
   Maximize2,
   X,
+  Eye as EyeIcon,
 } from 'lucide-react';
 import { UzbekAlphabetMode, formatUzbekText } from '../utils/uzbekAlphabet';
 import { SpotlightCard } from './SpotlightCard';
+import { MouseFollowingEyes } from '@/components/ui/mouse-following-eyes';
 
 interface GithubRepoItem {
   id: number;
@@ -741,6 +743,27 @@ export const LiveEcosystemSection: React.FC<LiveEcosystemSectionProps> = ({ alph
             </div>
           </div>
         )}
+      </div>
+
+      {/* Interactive UI Widget Showcase: Mouse Following Eyes */}
+      <div className="mt-10 p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 space-y-4">
+        <div className="flex items-center justify-between gap-4 border-b border-zinc-800/80 pb-3">
+          <div className="flex items-center gap-2.5">
+            <EyeIcon className="w-4 h-4 text-blue-400" />
+            <h3 className="font-display text-sm font-bold text-white">
+              {tr("Interaktiv UI Vidjeti · Sichqonchaga Ergashuvchi Ko'zlar (Mouse Following Eyes)")}
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono-tabular px-2.5 py-0.5 rounded bg-blue-600/15 border border-blue-500/30 text-blue-300">
+            shadcn/ui component
+          </span>
+        </div>
+        <p className="text-xs text-zinc-400 leading-relaxed">
+          {tr("Sichqonchani ushbu interaktiv hudud ustida harakatlantiring. Sichqoncha kursorining koordinatalari bo'yicha qorachiqlar trigonometrik hisoblash asosida dinamik ergashadi.")}
+        </p>
+        <div className="rounded-xl bg-[#050505] border border-zinc-800/80 overflow-hidden relative group">
+          <MouseFollowingEyes className="w-full h-48 flex justify-center items-center bg-gradient-to-br from-zinc-950 via-[#0A0A0D] to-zinc-900" />
+        </div>
       </div>
 
       {/* Lightbox Modal for Wikimedia Commons Photo */}

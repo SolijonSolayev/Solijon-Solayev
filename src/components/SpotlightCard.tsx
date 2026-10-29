@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
+import { soundEffects } from '../utils/soundEffects';
 
 interface SpotlightCardProps {
   children: React.ReactNode;
@@ -20,6 +21,23 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+  const lastSoundTimeRef = useRef<number>(0);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    const now = Date.now();
+    if (now - lastSoundTimeRef.current > 600) {
+      soundEffects.playCyberGlitch();
+      lastSoundTimeRef.current = now;
+    }
+  };
+
+  const handleClick = () => {
+    if (onClick) {
+      soundEffects.playClick();
+      onClick();
+    }
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -49,8 +67,8 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   return (
     <Component
       ref={containerRef}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       animate={

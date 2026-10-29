@@ -44,6 +44,8 @@ import {
   Video,
   Sun,
   Moon,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { AdminPanelView } from './components/AdminPanelView';
 import { BlogArticleView, formatUzbekDate } from './components/BlogArticleView';
@@ -51,8 +53,10 @@ import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { DigitalCardModal } from './components/DigitalCardModal';
 import { FlameCursor } from './components/FlameCursor';
 import { LiveEcosystemSection } from './components/LiveEcosystemSection';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { PortfolioChatbot } from './components/PortfolioChatbot';
 import { ProjectLightbox } from './components/ProjectLightbox';
+import { PWAInstallButton } from './components/PWAInstallButton';
 import { ParallaxImage, ParallaxLayer } from './components/ScrollParallax';
 import { SeoHead } from './components/SeoHead';
 import { SpotlightCard } from './components/SpotlightCard';
@@ -74,9 +78,15 @@ import {
 import {
   ALPHABET_STORAGE_KEY,
   formatUzbekText,
-  localizeProfileData,
   UzbekAlphabetMode,
 } from './utils/uzbekAlphabet';
+import {
+  SupportedLanguage,
+  LANGUAGE_STORAGE_KEY,
+  getTranslation,
+  localizeProfileForLanguage,
+} from './utils/i18n';
+import { soundEffects } from './utils/soundEffects';
 import { downloadVCard } from './utils/vcard';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
@@ -128,6 +138,49 @@ function resolveBlogIdentifierFromLocation(): string | null {
 
 export default function App() {
   const [rawProfile, setRawProfile] = useState<ProfileData>(DEFAULT_PROFILE_DATA);
+
+  // Supported Language state (uz / en)
+  const [language, setLanguage] = useState<SupportedLanguage>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get('lang');
+      if (urlLang === 'uz' || urlLang === 'en') {
+        return urlLang;
+      }
+      const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (saved === 'uz' || saved === 'en') {
+        return saved;
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return 'uz';
+  });
+
+  const handleLanguageChange = (lang: SupportedLanguage) => {
+    setLanguage(lang);
+    soundEffects.playChime();
+    try {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      const url = new URL(window.location.href);
+      if (lang === 'en') {
+        url.searchParams.set('lang', 'en');
+      } else {
+        url.searchParams.delete('lang');
+      }
+      window.history.replaceState({}, '', url.toString());
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  // Sound Effects toggle state
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(() => soundEffects.isEnabled());
+  const toggleSound = () => {
+    const next = soundEffects.toggle();
+    setSoundEnabled(next);
+  };
+
   const [alphabetMode, setAlphabetMode] = useState<UzbekAlphabetMode>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -146,6 +199,7 @@ export default function App() {
   });
 
   const handleAlphabetChange = (mode: UzbekAlphabetMode) => {
+    soundEffects.playClick();
     setAlphabetMode(mode);
     try {
       window.localStorage.setItem(ALPHABET_STORAGE_KEY, mode);
@@ -194,14 +248,20 @@ export default function App() {
   }, [themeMode]);
 
   const toggleThemeMode = () => {
+    soundEffects.playChime();
     setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const tr = (text: string) => formatUzbekText(text, alphabetMode);
+  const tr = (text: string) => {
+    if (language === 'en') {
+      return text;
+    }
+    return formatUzbekText(text, alphabetMode);
+  };
 
   const profile = useMemo(
-    () => localizeProfileData(rawProfile, alphabetMode),
-    [rawProfile, alphabetMode]
+    () => localizeProfileForLanguage(rawProfile, language, alphabetMode),
+    [rawProfile, language, alphabetMode]
   );
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -245,6 +305,7 @@ export default function App() {
   const toggleFlameCursor = () => {
     setFlameCursorEnabled((prev) => {
       const next = !prev;
+      soundEffects.playToggle(next);
       try {
         window.localStorage.setItem('solijon_flame_cursor_enabled', String(next));
       } catch {
@@ -353,6 +414,7 @@ export default function App() {
   const [confirmQuickDeletePostId, setConfirmQuickDeletePostId] = useState<string | null>(null);
 
   const navigateToPage = (page: ActiveSectionPage) => {
+    soundEffects.playClick();
     setActiveBlogIdentifier(null);
     setActivePage(page);
     const nextHash = page === 'home' ? '#men-haqimda' : `#${page}`;
@@ -408,6 +470,7 @@ export default function App() {
   };
 
   const openBlogPost = (post: BlogPostItem) => {
+    soundEffects.playClick();
     const slugOrId = post.slug || post.id;
     try {
       const url = new URL(window.location.href);
@@ -423,6 +486,7 @@ export default function App() {
   };
 
   const closeBlogPost = () => {
+    soundEffects.playClick();
     try {
       const url = new URL(window.location.href);
       url.searchParams.delete('article');
@@ -493,6 +557,7 @@ export default function App() {
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(profile.personal.email);
+    soundEffects.playSuccess();
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -508,6 +573,7 @@ export default function App() {
         projectType: senderProjectType,
         message: senderMessage || `${senderProjectType} bo'yicha murojaat`,
       });
+      soundEffects.playSuccess();
       setInquirySubmitted(true);
     } finally {
       setIsSendingInquiry(false);
@@ -595,6 +661,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col relative selection:bg-blue-600/30 selection:text-white">
+      <OfflineIndicator lang={language} alphabetMode={alphabetMode} />
       <FlameCursor enabled={flameCursorEnabled} />
       <SeoHead
         rawProfile={rawProfile}
@@ -614,7 +681,7 @@ export default function App() {
       />
 
       {/* 3-Zone Top Bar Contract */}
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 py-4 bg-[#050505]/85 backdrop-blur-xl border-b border-zinc-800/80">
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-6 px-4 sm:px-6 lg:px-12 py-3.5 bg-[#050505]/85 backdrop-blur-xl border-b border-zinc-800/80">
         {/* Zone 1: Single text element wordmark */}
         <a
           href="#men-haqimda"
@@ -629,8 +696,8 @@ export default function App() {
 
         {/* Zone 2: 5 concise single-line page navigation links */}
         <nav
-          aria-label={tr('Asosiy navigatsiya')}
-          className="hidden md:flex items-center gap-2 text-sm font-medium text-zinc-400"
+          aria-label={getTranslation('mainNavAria', language, alphabetMode)}
+          className="hidden md:flex items-center gap-1.5 lg:gap-2 text-sm font-medium text-zinc-400"
         >
           <a
             href="#men-haqimda"
@@ -639,13 +706,13 @@ export default function App() {
               e.preventDefault();
               navigateToPage('home');
             }}
-            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activePage === 'home'
                 ? 'text-white bg-blue-600/15 border border-blue-500/40 font-semibold shadow-xs'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/70 border border-transparent'
             }`}
           >
-            {tr('Men haqimda')}
+            {getTranslation('navAbout', language, alphabetMode)}
           </a>
           <a
             href="#loyihalar"
@@ -654,13 +721,13 @@ export default function App() {
               e.preventDefault();
               navigateToPage('loyihalar');
             }}
-            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activePage === 'loyihalar'
                 ? 'text-white bg-blue-600/15 border border-blue-500/40 font-semibold shadow-xs'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/70 border border-transparent'
             }`}
           >
-            {tr('Loyihalar')}
+            {getTranslation('navProjects', language, alphabetMode)}
           </a>
           <a
             href="#blog"
@@ -669,13 +736,13 @@ export default function App() {
               e.preventDefault();
               navigateToPage('blog');
             }}
-            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activePage === 'blog'
                 ? 'text-white bg-blue-600/15 border border-blue-500/40 font-semibold shadow-xs'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/70 border border-transparent'
             }`}
           >
-            {tr('Blog')}
+            {getTranslation('navBlog', language, alphabetMode)}
           </a>
           <a
             href="#tajriba"
@@ -684,13 +751,13 @@ export default function App() {
               e.preventDefault();
               navigateToPage('tajriba');
             }}
-            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activePage === 'tajriba'
                 ? 'text-white bg-blue-600/15 border border-blue-500/40 font-semibold shadow-xs'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/70 border border-transparent'
             }`}
           >
-            {tr('Faoliyat')}
+            {getTranslation('navExperience', language, alphabetMode)}
           </a>
           <a
             href="#boglanish"
@@ -699,29 +766,72 @@ export default function App() {
               e.preventDefault();
               navigateToPage('boglanish');
             }}
-            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activePage === 'boglanish'
                 ? 'text-white bg-blue-600/15 border border-blue-500/40 font-semibold shadow-xs'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/70 border border-transparent'
             }`}
           >
-            {tr("Bog'lanish")}
+            {getTranslation('navContact', language, alphabetMode)}
           </a>
         </nav>
 
-        {/* Zone 3: Theme mode, Flame cursor toggle & primary action */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Zone 3: PWA Install, Audio FX, Language Switcher, Theme, Flame & Primary Action */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* PWA Install Button */}
+          <PWAInstallButton lang={language} alphabetMode={alphabetMode} />
+
+          {/* Sound FX Haptic Synthesizer Toggle */}
+          <button
+            type="button"
+            onClick={toggleSound}
+            title={
+              soundEnabled
+                ? getTranslation('soundMute', language, alphabetMode)
+                : getTranslation('soundUnmute', language, alphabetMode)
+            }
+            aria-label={soundEnabled ? 'Mute audio' : 'Enable audio'}
+            className={`px-2.5 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+              soundEnabled
+                ? 'bg-blue-600/15 border-blue-500/40 text-blue-300 hover:bg-blue-600/25'
+                : 'bg-[#0F0F12] border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
+            }`}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-3.5 h-3.5 text-blue-400" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+            )}
+            <span className="hidden xl:inline">{getTranslation('sound', language, alphabetMode)}</span>
+          </button>
+
+          {/* Dual Language Switcher: O'zbekcha / English */}
+          <button
+            type="button"
+            onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
+            title={language === 'uz' ? 'Switch interface to English' : "Interfeysni o'zbek tiliga o'tkazish"}
+            aria-label="Language Switcher"
+            className="px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <span className="font-semibold">{language === 'uz' ? 'OʻZ' : 'EN'}</span>
+          </button>
+
           {/* Dual Theme Mode Toggle: Tun (Default) / Kun (Hashamatli oq-sariq) */}
           <button
             type="button"
             onClick={toggleThemeMode}
             title={
               themeMode === 'dark'
-                ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
-                : tr("Tungi rejimga o'tish (Qorong'i)")
+                ? getTranslation('toDayMode', language, alphabetMode)
+                : getTranslation('toNightMode', language, alphabetMode)
             }
-            aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
-            className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+            aria-label={
+              themeMode === 'dark'
+                ? getTranslation('dayMode', language, alphabetMode)
+                : getTranslation('nightMode', language, alphabetMode)
+            }
+            className={`px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               themeMode === 'light'
                 ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
                 : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
@@ -730,26 +840,27 @@ export default function App() {
             {themeMode === 'dark' ? (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden sm:inline">{tr('Kun')}</span>
+                <span className="hidden sm:inline">{getTranslation('dayMode', language, alphabetMode)}</span>
               </>
             ) : (
               <>
                 <Moon className="w-3.5 h-3.5 text-amber-700" />
-                <span className="hidden sm:inline">{tr('Tun')}</span>
+                <span className="hidden sm:inline">{getTranslation('nightMode', language, alphabetMode)}</span>
               </>
             )}
           </button>
 
+          {/* Interactive Flame Cursor Toggle */}
           <button
             type="button"
             onClick={toggleFlameCursor}
             title={
               flameCursorEnabled
-                ? tr("Olovli kursorni o'chirish")
-                : tr('Olovli kursorni yoqish')
+                ? getTranslation('flameCursorDisable', language, alphabetMode)
+                : getTranslation('flameCursorEnable', language, alphabetMode)
             }
             aria-pressed={flameCursorEnabled}
-            className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`px-2.5 sm:px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               flameCursorEnabled
                 ? 'bg-orange-500/15 border-orange-500/50 text-orange-300 shadow-sm shadow-orange-500/20 hover:bg-orange-500/25'
                 : 'bg-[#0F0F12] border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
@@ -760,17 +871,20 @@ export default function App() {
                 flameCursorEnabled ? 'text-orange-400 animate-pulse' : 'text-zinc-500'
               }`}
             />
-            <span className="hidden sm:inline">{tr('Olov kursor')}</span>
+            <span className="hidden lg:inline">{getTranslation('flameCursor', language, alphabetMode)}</span>
           </button>
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="button"
-            onClick={() => setIsCardModalOpen(true)}
-            className="px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-blue-600/20"
+            onClick={() => {
+              soundEffects.playClick();
+              setIsCardModalOpen(true);
+            }}
+            className="px-3.5 sm:px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-blue-600/20"
           >
-            {tr('Raqamli Vizitka')}
+            {getTranslation('digitalCard', language, alphabetMode)}
           </motion.button>
         </div>
       </header>
@@ -781,11 +895,11 @@ export default function App() {
           <div className="flex items-center gap-1.5 w-max">
             {(
               [
-                { id: 'home', label: 'Men haqimda' },
-                { id: 'loyihalar', label: 'Loyihalar' },
-                { id: 'blog', label: 'Blog' },
-                { id: 'tajriba', label: 'Faoliyat' },
-                { id: 'boglanish', label: "Bog'lanish" },
+                { id: 'home', labelKey: 'navAbout' as const },
+                { id: 'loyihalar', labelKey: 'navProjects' as const },
+                { id: 'blog', labelKey: 'navBlog' as const },
+                { id: 'tajriba', labelKey: 'navExperience' as const },
+                { id: 'boglanish', labelKey: 'navContact' as const },
               ] as const
             ).map((tab) => (
               <button
@@ -798,9 +912,32 @@ export default function App() {
                     : 'text-zinc-400 hover:text-white bg-[#0F0F12] border border-zinc-800'
                 }`}
               >
-                {tr(tab.label)}
+                {getTranslation(tab.labelKey, language, alphabetMode)}
               </button>
             ))}
+
+            <button
+              type="button"
+              onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
+              className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-[#0F0F12] border border-zinc-800 text-blue-400 cursor-pointer inline-flex items-center gap-1"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-400" />
+              <span>{language === 'uz' ? 'OʻZ' : 'EN'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleSound}
+              title={soundEnabled ? 'Mute' : 'Unmute'}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#0F0F12] border border-zinc-800 text-zinc-300 cursor-pointer inline-flex items-center gap-1"
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-3.5 h-3.5 text-blue-400" />
+              ) : (
+                <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+              )}
+            </button>
+
             <button
               type="button"
               onClick={toggleThemeMode}
@@ -832,62 +969,75 @@ export default function App() {
                   className="px-3.5 py-2 text-xs font-medium text-zinc-200 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-blue-500/50 hover:text-white transition-colors inline-flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-blue-400" />
-                  <span>{tr('Asosiy sahifaga (Men haqimda)')}</span>
+                  <span>{getTranslation('backToHome', language, alphabetMode)}</span>
                 </button>
                 <span aria-hidden="true" className="text-zinc-600 hidden sm:inline">
                   /
                 </span>
                 <span className="text-xs font-mono-tabular text-blue-400 hidden sm:inline">
-                  {activePage === 'loyihalar' && tr('Loyihalar sahifasi')}
-                  {activePage === 'blog' && tr('Shaxsiy Blog sahifasi')}
-                  {activePage === 'tajriba' && tr("Faoliyat, Ko'nikmalar va Jonli Ekotizim")}
-                  {activePage === 'boglanish' && tr("Bog'lanish va Murojaat sahifasi")}
+                  {activePage === 'loyihalar' && (language === 'en' ? 'Projects Page' : tr('Loyihalar sahifasi'))}
+                  {activePage === 'blog' && (language === 'en' ? 'Personal Blog' : tr('Shaxsiy Blog sahifasi'))}
+                  {activePage === 'tajriba' && (language === 'en' ? 'Experience & Live Ecosystem' : tr("Faoliyat, Ko'nikmalar va Jonli Ekotizim"))}
+                  {activePage === 'boglanish' && (language === 'en' ? 'Contact & Inquiries' : tr("Bog'lanish va Murojaat sahifasi"))}
                 </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5">
-                <div
-                  role="group"
-                  aria-label={tr("O'zbek alifbosini tanlash")}
-                  className="flex items-center gap-1 p-1 bg-[#0F0F12] border border-zinc-800 rounded-lg"
+                {/* Language Switcher */}
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
+                  title={language === 'uz' ? 'Switch interface to English' : "Interfeysni o'zbek tiliga o'tkazish"}
+                  className="px-3 py-2 text-xs font-medium rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1.5 cursor-pointer"
                 >
-                  {(
-                    [
-                      {
-                        id: 'new_2026',
-                        label: 'Ö Ğ Ş Ç · Yangi',
-                        title: 'Yangilangan özbek lotin alifbosi (2026)',
-                      },
-                      {
-                        id: 'classic',
-                        label: 'Oʻ Gʻ Sh Ch · Amaldagi',
-                        title: "Amaldagi o'zbek lotin alifbosi",
-                      },
-                    ] as const
-                  ).map((item) => {
-                    const isActive = alphabetMode === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => handleAlphabetChange(item.id)}
-                        title={item.title}
-                        className={`relative px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                          isActive ? 'text-white' : 'text-zinc-400 hover:text-white'
-                        }`}
-                      >
-                        {isActive && (
-                          <motion.span
-                            layoutId="activeSubpageAlphabetSwitch"
-                            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                            className="absolute inset-0 bg-blue-600 rounded-md -z-0"
-                          />
-                        )}
-                        <span className="relative z-10">{item.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                  <Globe className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="font-semibold">{language === 'uz' ? 'OʻZ' : 'EN'}</span>
+                </button>
+
+                {language === 'uz' && (
+                  <div
+                    role="group"
+                    aria-label={tr("O'zbek alifbosini tanlash")}
+                    className="flex items-center gap-1 p-1 bg-[#0F0F12] border border-zinc-800 rounded-lg"
+                  >
+                    {(
+                      [
+                        {
+                          id: 'new_2026',
+                          label: 'Ö Ğ Ş Ç · Yangi',
+                          title: 'Yangilangan özbek lotin alifbosi (2026)',
+                        },
+                        {
+                          id: 'classic',
+                          label: 'Oʻ Gʻ Sh Ch · Amaldagi',
+                          title: "Amaldagi o'zbek lotin alifbosi",
+                        },
+                      ] as const
+                    ).map((item) => {
+                      const isActive = alphabetMode === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleAlphabetChange(item.id)}
+                          title={item.title}
+                          className={`relative px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            isActive ? 'text-white' : 'text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          {isActive && (
+                            <motion.span
+                              layoutId="activeSubpageAlphabetSwitch"
+                              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                              className="absolute inset-0 bg-blue-600 rounded-md -z-0"
+                            />
+                          )}
+                          <span className="relative z-10">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
                 <button
                   type="button"
@@ -923,7 +1073,7 @@ export default function App() {
                   className="px-3 py-2 text-xs font-medium text-zinc-300 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-blue-500/50 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Search className="w-3.5 h-3.5 text-blue-400" />
-                  <span>{tr('Qidiruv')}</span>
+                  <span>{getTranslation('search', language, alphabetMode)}</span>
                 </button>
               </div>
             </div>
@@ -954,49 +1104,62 @@ export default function App() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Animated Dual Uzbek Alphabet Switcher */}
-              <div
-                role="group"
-                aria-label={tr("O'zbek alifbosini tanlash")}
-                className="flex items-center gap-1 p-1 bg-[#0F0F12] border border-zinc-800 rounded-lg"
+              {/* Dual Language Switcher: OʻZ / EN */}
+              <button
+                type="button"
+                onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
+                title={language === 'uz' ? 'Switch interface to English' : "Interfeysni o'zbek tiliga o'tkazish"}
+                className="px-3 py-2 text-xs font-semibold rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1.5 cursor-pointer"
               >
-                {(
-                  [
-                    {
-                      id: 'new_2026',
-                      label: 'Ö Ğ Ş Ç · Yangi',
-                      title: 'Yangilangan özbek lotin alifbosi (2026)',
-                    },
-                    {
-                      id: 'classic',
-                      label: 'Oʻ Gʻ Sh Ch · Amaldagi',
-                      title: "Amaldagi o'zbek lotin alifbosi",
-                    },
-                  ] as const
-                ).map((item) => {
-                  const isActive = alphabetMode === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleAlphabetChange(item.id)}
-                      title={item.title}
-                      className={`relative px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                        isActive ? 'text-white' : 'text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      {isActive && (
-                        <motion.span
-                          layoutId="activeAlphabetSwitch"
-                          transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                          className="absolute inset-0 bg-blue-600 rounded-md -z-0"
-                        />
-                      )}
-                      <span className="relative z-10">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                <Globe className="w-3.5 h-3.5 text-blue-400" />
+                <span>{language === 'uz' ? 'OʻZ' : 'EN'}</span>
+              </button>
+
+              {/* Animated Dual Uzbek Alphabet Switcher (active when in Uzbek) */}
+              {language === 'uz' && (
+                <div
+                  role="group"
+                  aria-label={tr("O'zbek alifbosini tanlash")}
+                  className="flex items-center gap-1 p-1 bg-[#0F0F12] border border-zinc-800 rounded-lg"
+                >
+                  {(
+                    [
+                      {
+                        id: 'new_2026',
+                        label: 'Ö Ğ Ş Ç · Yangi',
+                        title: 'Yangilangan özbek lotin alifbosi (2026)',
+                      },
+                      {
+                        id: 'classic',
+                        label: 'Oʻ Gʻ Sh Ch · Amaldagi',
+                        title: "Amaldagi o'zbek lotin alifbosi",
+                      },
+                    ] as const
+                  ).map((item) => {
+                    const isActive = alphabetMode === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleAlphabetChange(item.id)}
+                        title={item.title}
+                        className={`relative px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          isActive ? 'text-white' : 'text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.span
+                            layoutId="activeAlphabetSwitch"
+                            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                            className="absolute inset-0 bg-blue-600 rounded-md -z-0"
+                          />
+                        )}
+                        <span className="relative z-10">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               <button
                 type="button"
@@ -1028,25 +1191,32 @@ export default function App() {
 
               <button
                 type="button"
-                onClick={() => setIsCommandPaletteOpen(true)}
-                title={tr('Tezkor qidiruv va buyruqlar oynasi (Ctrl+K)')}
+                onClick={() => {
+                  soundEffects.playClick();
+                  setIsCommandPaletteOpen(true);
+                }}
+                title={language === 'en' ? 'Quick search & command palette (Ctrl+K)' : tr('Tezkor qidiruv va buyruqlar oynasi (Ctrl+K)')}
                 className="px-3 py-2 text-xs font-medium text-zinc-300 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-blue-500/50 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Search className="w-3.5 h-3.5 text-blue-400" />
-                <span>{tr('Qidiruv')}</span>
+                <span>{getTranslation('search', language, alphabetMode)}</span>
                 <kbd className="px-1.5 py-0.5 text-[10px] font-mono-tabular bg-zinc-900 border border-zinc-700 rounded text-zinc-400">
                   ⌘K
                 </kbd>
               </button>
+
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                onClick={() => downloadVCard(profile)}
+                onClick={() => {
+                  soundEffects.playSuccess();
+                  downloadVCard(profile);
+                }}
                 className="px-3.5 py-2 text-xs font-medium text-zinc-200 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5 text-zinc-400" />
-                {tr('vCard (.vcf) yuklash')}
+                {language === 'en' ? 'Download vCard (.vcf)' : tr('vCard (.vcf) yuklash')}
               </motion.button>
             </div>
           </motion.div>

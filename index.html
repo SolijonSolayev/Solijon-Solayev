@@ -3,6 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // In AI Studio environment, HMR WebSocket is disabled across the Cloud Run iframe proxy.
+      // Intercept and suppress benign Vite WebSocket disconnection events to keep error monitors clean.
+      (function() {
+        window.addEventListener('error', function(event) {
+          if (
+            event &&
+            ((event.message && (event.message.indexOf('WebSocket') !== -1 || event.message.indexOf('vite') !== -1)) ||
+             (event.error && event.error.message && (event.error.message.indexOf('WebSocket') !== -1 || event.error.message.indexOf('vite') !== -1)))
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+        window.addEventListener('unhandledrejection', function(event) {
+          if (event && event.reason && String(event.reason).indexOf('WebSocket') !== -1) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+      })();
+    </script>
     <title>Solijon Solayev — Shaxsiy Vizitka va IT Portfolio</title>
     <meta name="description" content="Solijon Solayevning shaxsiy raqamli vizitkasi, IT portfeli (Solaris 3D, Tilimlo.uz), shaxsiy blogi, Vikipediya va Vikiombor jonli ekotizimi hamda ikki alifboli (Ö, Ğ, Ş, Ç va Oʻ, Gʻ, Sh, Ch) veb-platformasi." />
     <meta name="keywords" content="Solijon Solayev, Solijon_Solayev, SolijonSolayev.uz, Solaris 3D, solaris3d.uz, Tilimlo.uz, tilimlo.uz, usb-formatter, AqlliTozalash, kvadrat-tenglamalar, Frontend dasturchi, Frontend dasturçi, O'zbekcha Vikipediya, Özbekça Vikipediya, Vikiombor, Wikimedia Commons fotogalereya, Fikr qilamiz blog, Shaxsiy vizitka, Şaxsiy vizitka, Xorazm Yangiariq IT portfolio" />
@@ -12,8 +36,16 @@
     <meta name="yandex" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
     <meta name="geo.region" content="UZ-XO" />
-    <meta name="geo.placename" content="Yangiariq, Xorazm, Uzbekistan" />
     <meta name="theme-color" content="#050505" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Solijon" />
+    <meta name="application-name" content="Solijon Solayev" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
 
     <!-- OpenGraph Social Cards (Google, Telegram, LinkedIn, Facebook, Yandex) -->
     <meta property="og:title" content="Solijon Solayev — Shaxsiy Vizitka va IT Portfolio" />

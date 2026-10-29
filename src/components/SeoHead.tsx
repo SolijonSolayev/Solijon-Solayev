@@ -32,14 +32,24 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     const tr = (text: string) => formatUzbekText(text, alphabetMode);
 
     let sectionHash = '';
+    const params = new URLSearchParams();
+    if (alphabetMode === 'classic') {
+      params.set('alphabet', 'classic');
+    }
+
     if (activeBlogPost) {
-      sectionHash = `#blog/${encodeURIComponent(activeBlogPost.slug || activeBlogPost.id)}`;
+      const slugOrId = activeBlogPost.slug || activeBlogPost.id;
+      params.set('article', slugOrId);
+      sectionHash = `#blog/${encodeURIComponent(slugOrId)}`;
     } else if (activePage !== 'home') {
       sectionHash = `#${activePage}`;
     }
 
-    const querySuffix = alphabetMode === 'classic' ? '?alphabet=classic' : '';
-    const canonicalUrl = `${baseUrl}${querySuffix}${sectionHash}`;
+    const queryString = params.toString();
+    const querySuffix = queryString ? `?${queryString}` : '';
+    const canonicalUrl = activeBlogPost
+      ? `${baseUrl}${querySuffix}`
+      : `${baseUrl}${querySuffix}${sectionHash}`;
 
     // Update <html lang="..."> attribute for search engines while keeping both scripts indexed
     document.documentElement.setAttribute(
@@ -130,14 +140,21 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     setOrCreateMeta('name', 'twitter:image', ogImage);
 
     // Canonical & alternate hreflang links for both alphabets
+    const articleQueryPart = activeBlogPost
+      ? `&article=${encodeURIComponent(activeBlogPost.slug || activeBlogPost.id)}`
+      : '';
+    const defaultArticleQuery = activeBlogPost
+      ? `?article=${encodeURIComponent(activeBlogPost.slug || activeBlogPost.id)}`
+      : sectionHash;
+
     setOrCreateLink('canonical', canonicalUrl);
-    setOrCreateLink('alternate', `${baseUrl}?alphabet=new_2026${sectionHash}`, {
+    setOrCreateLink('alternate', `${baseUrl}?alphabet=new_2026${articleQueryPart}${sectionHash}`, {
       hreflang: 'uz-Latn',
     });
-    setOrCreateLink('alternate', `${baseUrl}?alphabet=classic${sectionHash}`, {
+    setOrCreateLink('alternate', `${baseUrl}?alphabet=classic${articleQueryPart}${sectionHash}`, {
       hreflang: 'uz',
     });
-    setOrCreateLink('alternate', `${baseUrl}${sectionHash}`, { hreflang: 'x-default' });
+    setOrCreateLink('alternate', `${baseUrl}${defaultArticleQuery}`, { hreflang: 'x-default' });
 
     // Dual-alphabet SEO keywords for Google, Yandex, and Bing
     const classicBio = toClassicUzbekLatin(rawProfile.personal.shortBio);
@@ -364,24 +381,32 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
           '@id': `${baseUrl}#person`,
         },
         blogPost: (rawProfile.blogPosts || [])
-          .filter((p) => p.published)
-          .map((post) => ({
-            '@type': 'BlogPosting',
-            headline: toNewUzbekLatin(post.title),
-            alternativeHeadline: toClassicUzbekLatin(post.title),
-            datePublished: post.publishedAt,
-            articleSection: post.category,
-            keywords: (post.tags || []).join(', '),
-            url: `${baseUrl}#blog/${post.slug || post.id}`,
-            author: {
-              '@id': `${baseUrl}#person`,
-            },
-            description: `${toNewUzbekLatin(post.excerpt)} | ${toClassicUzbekLatin(post.excerpt)}`,
-          })),
+          .filter((p) => p.published !== false)
+          .map((post) => {
+            const postSlug = encodeURIComponent(post.slug || post.id);
+            const postUrl = `${baseUrl}?article=${postSlug}`;
+            return {
+              '@type': 'BlogPosting',
+              '@id': postUrl,
+              mainEntityOfPage: postUrl,
+              headline: toNewUzbekLatin(post.title),
+              alternativeHeadline: toClassicUzbekLatin(post.title),
+              datePublished: post.publishedAt,
+              dateModified: post.publishedAt,
+              articleSection: post.category,
+              keywords: (post.tags || []).join(', '),
+              url: postUrl,
+              author: {
+                '@id': `${baseUrl}#person`,
+              },
+              description: `${toNewUzbekLatin(post.excerpt)} | ${toClassicUzbekLatin(post.excerpt)}`,
+            };
+          }),
       },
     ];
 
     if (activeBlogPost) {
+      const wordCount = (activeBlogPost.content || '').trim().split(/\s+/).filter(Boolean).length;
       graphEntities.push({
         '@type': 'BlogPosting',
         '@id': canonicalUrl,
@@ -389,8 +414,10 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
         headline: toNewUzbekLatin(activeBlogPost.title),
         alternativeHeadline: toClassicUzbekLatin(activeBlogPost.title),
         datePublished: activeBlogPost.publishedAt,
+        dateModified: activeBlogPost.publishedAt,
         articleSection: activeBlogPost.category,
         keywords: (activeBlogPost.tags || []).join(', '),
+        wordCount,
         image: ogImage,
         inLanguage: ['uz-Latn', 'uz'],
         author: {
@@ -401,6 +428,9 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
         },
         description: `${toNewUzbekLatin(activeBlogPost.excerpt)} | ${toClassicUzbekLatin(
           activeBlogPost.excerpt
+        )}`,
+        articleBody: `${toNewUzbekLatin(activeBlogPost.content || '')}\n\n${toClassicUzbekLatin(
+          activeBlogPost.content || ''
         )}`,
       });
     }

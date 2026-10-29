@@ -152,6 +152,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   const [authError, setAuthError] = useState<string | null>(null);
   const [showDomainHelp, setShowDomainHelp] = useState(false);
   const [copiedField, setCopiedField] = useState<'domain' | 'project' | null>(null);
+  const [copiedSeoPostId, setCopiedSeoPostId] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
 
   // Blog Admin Editor & Auto-Populated Form State
@@ -637,6 +638,114 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
     const a = document.createElement('a');
     a.href = url;
     a.download = 'solijon_solayev_vizitka.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyPostSeoUrl = (post: BlogPostItem) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://solijonsolayev.uz';
+    const slugOrId = encodeURIComponent(post.slug || post.id);
+    const seoUrl = `${origin}/?article=${slugOrId}`;
+    navigator.clipboard.writeText(seoUrl);
+    setCopiedSeoPostId(post.id);
+    setTimeout(() => setCopiedSeoPostId(null), 2200);
+  };
+
+  const handleDownloadSitemapXml = () => {
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://solijonsolayev.github.io';
+    const today = new Date().toISOString().slice(0, 10);
+    const publishedPosts = (draft.blogPosts || []).filter((p) => p.published !== false);
+
+    const staticUrls = [
+      { loc: `${origin}/`, lastmod: today, changefreq: 'weekly', priority: '1.0' },
+      { loc: `${origin}/?alphabet=new_2026`, lastmod: today, changefreq: 'weekly', priority: '0.95' },
+      { loc: `${origin}/?alphabet=classic`, lastmod: today, changefreq: 'weekly', priority: '0.95' },
+      { loc: `${origin}/?page=loyihalar`, lastmod: today, changefreq: 'weekly', priority: '0.90' },
+      { loc: `${origin}/?page=blog`, lastmod: today, changefreq: 'daily', priority: '0.95' },
+      { loc: `${origin}/?page=tajriba`, lastmod: today, changefreq: 'weekly', priority: '0.85' },
+      { loc: `${origin}/?page=boglanish`, lastmod: today, changefreq: 'monthly', priority: '0.80' },
+    ];
+
+    const postUrls = publishedPosts.map((post) => {
+      const slug = encodeURIComponent(post.slug || post.id);
+      return {
+        loc: `${origin}/?article=${slug}`,
+        lastmod: post.publishedAt || today,
+        changefreq: 'monthly',
+        priority: post.featured ? '0.90' : '0.85',
+      };
+    });
+
+    const allUrls = [...staticUrls, ...postUrls];
+    const xmlLines = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      ...allUrls.map(
+        (u) =>
+          `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`
+      ),
+      '</urlset>',
+    ];
+
+    const blob = new Blob([xmlLines.join('\n')], { type: 'application/xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sitemap.xml';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadRssXml = () => {
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://solijonsolayev.github.io';
+    const publishedPosts = (draft.blogPosts || []).filter((p) => p.published !== false);
+    const escapeXml = (str: string) =>
+      (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    const itemsXml = publishedPosts
+      .map((post) => {
+        const slug = encodeURIComponent(post.slug || post.id);
+        const link = `${origin}/?article=${slug}`;
+        const pubDate = post.publishedAt
+          ? new Date(post.publishedAt).toUTCString()
+          : new Date().toUTCString();
+        return [
+          '    <item>',
+          `      <title>${escapeXml(post.title)}</title>`,
+          `      <link>${link}</link>`,
+          `      <guid isPermaLink="true">${link}</guid>`,
+          `      <pubDate>${pubDate}</pubDate>`,
+          `      <category>${escapeXml(post.category)}</category>`,
+          `      <description>${escapeXml(post.excerpt)}</description>`,
+          '    </item>',
+        ].join('\n');
+      })
+      .join('\n');
+
+    const rssContent = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+      '  <channel>',
+      `    <title>${escapeXml(draft.personal.fullName)} — Shaxsiy Blog («Fikr qilamiz»)</title>`,
+      `    <link>${origin}/?page=blog</link>`,
+      `    <description>${escapeXml(draft.personal.shortBio)}</description>`,
+      '    <language>uz</language>',
+      itemsXml,
+      '  </channel>',
+      '</rss>',
+    ].join('\n');
+
+    const blob = new Blob([rssContent], { type: 'application/rss+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'rss.xml';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -1556,7 +1665,29 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleDownloadSitemapXml}
+                    title={tr(
+                      "Yangi maqolalar qo'shilgan dinamik sitemap.xml faylini Google Search Console uchun yuklab olish"
+                    )}
+                    className="px-3.5 py-2.5 text-xs font-medium text-zinc-200 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-blue-500/50 hover:text-white transition-colors inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 text-blue-400" />
+                    {tr('Sitemap.xml (SEO)')}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadRssXml}
+                    title={tr("Yangi maqolalar bilan boyitilgan RSS.xml faylini yuklab olish")}
+                    className="px-3.5 py-2.5 text-xs font-medium text-zinc-200 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-amber-500/50 hover:text-white transition-colors inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 text-amber-400" />
+                    {tr('RSS.xml')}
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleAddBlogPost}
@@ -1727,6 +1858,28 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
                             }`}
                           >
                             {post.featured ? tr('Tanlangan ★') : tr('Pin qilish')}
+                          </button>
+
+                          {/* Copy Direct Indexable SEO Link (?article=slug) */}
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPostSeoUrl(post)}
+                            title={tr(
+                              "Google va ijtimoiy tarmoqlar uchun to'g'ridan-to'g'ri indekslanadigan SEO havolani (?article=...) nusxalash"
+                            )}
+                            className="px-3 py-1.5 text-xs font-medium text-zinc-300 bg-[#050505] border border-zinc-800 rounded-lg hover:border-blue-500/50 hover:text-white transition-colors inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                          >
+                            {copiedSeoPostId === post.id ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400">{tr('SEO havola nusxalandi')}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Link2 className="w-3.5 h-3.5 text-blue-400" />
+                                <span>{tr('SEO havola')}</span>
+                              </>
+                            )}
                           </button>
 
                           {/* Edit Button: Auto-Populates Form */}

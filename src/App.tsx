@@ -80,7 +80,22 @@ import { downloadVCard } from './utils/vcard';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
 
-function resolvePageFromHash(hash: string): ActiveSectionPage {
+function resolvePageFromHash(hash: string, search: string = ''): ActiveSectionPage {
+  try {
+    const params = new URLSearchParams(search);
+    if (params.get('article')) return 'blog';
+    const pageParam = (params.get('page') || '').toLowerCase();
+    if (
+      pageParam === 'loyihalar' ||
+      pageParam === 'blog' ||
+      pageParam === 'tajriba' ||
+      pageParam === 'boglanish'
+    ) {
+      return pageParam;
+    }
+  } catch {
+    // ignore URLSearchParams errors
+  }
   const normalized = (hash || '').toLowerCase();
   if (normalized === '#loyihalar') return 'loyihalar';
   if (normalized === '#blog' || normalized.startsWith('#blog/')) return 'blog';
@@ -89,6 +104,23 @@ function resolvePageFromHash(hash: string): ActiveSectionPage {
   }
   if (normalized === '#boglanish') return 'boglanish';
   return 'home';
+}
+
+function resolveBlogIdentifierFromLocation(): string | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const articleParam = params.get('article');
+    if (articleParam) {
+      return articleParam;
+    }
+  } catch {
+    // ignore URLSearchParams errors
+  }
+  const hash = window.location.hash;
+  if (hash.startsWith('#blog/')) {
+    return decodeURIComponent(hash.slice('#blog/'.length));
+  }
+  return null;
 }
 
 export default function App() {
@@ -139,17 +171,13 @@ export default function App() {
   });
   const [adminInitialEditPostId, setAdminInitialEditPostId] = useState<string | null>(null);
   const [activePage, setActivePage] = useState<ActiveSectionPage>(() =>
-    resolvePageFromHash(window.location.hash)
+    resolvePageFromHash(window.location.hash, window.location.search)
   );
 
   // Blog reader & filtering state
-  const [activeBlogIdentifier, setActiveBlogIdentifier] = useState<string | null>(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#blog/')) {
-      return decodeURIComponent(hash.slice('#blog/'.length));
-    }
-    return null;
-  });
+  const [activeBlogIdentifier, setActiveBlogIdentifier] = useState<string | null>(() =>
+    resolveBlogIdentifierFromLocation()
+  );
   const [selectedBlogCategory, setSelectedBlogCategory] = useState<'Barchasi' | BlogCategory>(
     'Barchasi'
   );
@@ -249,19 +277,21 @@ export default function App() {
         setRawProfile(cloudProfile);
       }
     });
-    const handleHashChange = () => {
+    const handleUrlStateChange = () => {
       const hash = window.location.hash;
       setIsAdminRoute(hash === '#admin');
-      if (hash.startsWith('#blog/')) {
-        setActiveBlogIdentifier(decodeURIComponent(hash.slice('#blog/'.length)));
+      const blogId = resolveBlogIdentifierFromLocation();
+      if (blogId) {
+        setActiveBlogIdentifier(blogId);
         setActivePage('blog');
       } else {
         setActiveBlogIdentifier(null);
-        setActivePage(resolvePageFromHash(hash));
+        setActivePage(resolvePageFromHash(hash, window.location.search));
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleUrlStateChange);
+    window.addEventListener('popstate', handleUrlStateChange);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -274,7 +304,8 @@ export default function App() {
     return () => {
       unsubAuth();
       unsubPortfolio();
-      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('hashchange', handleUrlStateChange);
+      window.removeEventListener('popstate', handleUrlStateChange);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -286,12 +317,20 @@ export default function App() {
     setActiveBlogIdentifier(null);
     setActivePage(page);
     const nextHash = page === 'home' ? '#men-haqimda' : `#${page}`;
-    if (window.location.hash !== nextHash) {
-      window.history.pushState(
-        '',
-        document.title,
-        `${window.location.pathname}${window.location.search}${nextHash}`
-      );
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('article');
+      url.searchParams.delete('page');
+      url.hash = nextHash;
+      window.history.pushState('', document.title, url.toString());
+    } catch {
+      if (window.location.hash !== nextHash) {
+        window.history.pushState(
+          '',
+          document.title,
+          `${window.location.pathname}${window.location.search}${nextHash}`
+        );
+      }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -331,14 +370,28 @@ export default function App() {
 
   const openBlogPost = (post: BlogPostItem) => {
     const slugOrId = post.slug || post.id;
-    window.location.hash = `blog/${encodeURIComponent(slugOrId)}`;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('article', slugOrId);
+      url.hash = `blog/${encodeURIComponent(slugOrId)}`;
+      window.history.pushState('', document.title, url.toString());
+    } catch {
+      window.location.hash = `blog/${encodeURIComponent(slugOrId)}`;
+    }
     setActiveBlogIdentifier(slugOrId);
     setActivePage('blog');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const closeBlogPost = () => {
-    history.pushState('', document.title, `${window.location.pathname}${window.location.search}#blog`);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('article');
+      url.hash = 'blog';
+      window.history.pushState('', document.title, url.toString());
+    } catch {
+      history.pushState('', document.title, `${window.location.pathname}#blog`);
+    }
     setActiveBlogIdentifier(null);
     setActivePage('blog');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1271,7 +1324,15 @@ export default function App() {
                       <span className="font-mono-tabular">{post.readTime}</span>
                     </div>
                     <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
-                      {post.title}
+                      <a
+                        href={`?article=${encodeURIComponent(post.slug || post.id)}#blog/${encodeURIComponent(post.slug || post.id)}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openBlogPost(post);
+                        }}
+                      >
+                        {post.title}
+                      </a>
                     </h3>
                     <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
                       {post.excerpt}
@@ -1878,7 +1939,15 @@ export default function App() {
                               </div>
 
                               <h3 className="font-display text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
-                                {leadPost.title}
+                                <a
+                                  href={`?article=${encodeURIComponent(leadPost.slug || leadPost.id)}#blog/${encodeURIComponent(leadPost.slug || leadPost.id)}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    openBlogPost(leadPost);
+                                  }}
+                                >
+                                  {leadPost.title}
+                                </a>
                               </h3>
 
                               <p className="text-sm sm:text-base text-zinc-300 leading-relaxed line-clamp-3">
@@ -2030,7 +2099,15 @@ export default function App() {
                                 </div>
 
                                 <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
-                                  {post.title}
+                                  <a
+                                    href={`?article=${encodeURIComponent(post.slug || post.id)}#blog/${encodeURIComponent(post.slug || post.id)}`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      openBlogPost(post);
+                                    }}
+                                  >
+                                    {post.title}
+                                  </a>
                                 </h3>
 
                                 <p className="text-sm text-zinc-400 leading-relaxed line-clamp-3">

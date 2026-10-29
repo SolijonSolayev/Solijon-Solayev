@@ -699,7 +699,7 @@ export default function App() {
       />
 
       {/* 3-Zone Top Bar Contract */}
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-6 px-4 sm:px-6 lg:px-12 py-3.5 bg-[#050505]/85 backdrop-blur-xl border-b border-zinc-800/80">
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-6 lg:px-12 py-3 sm:py-3.5 bg-[#050505]/85 backdrop-blur-xl border-b border-zinc-800/80 max-w-full overflow-hidden">
         {/* Zone 1: Single text element wordmark */}
         <a
           href="#men-haqimda"
@@ -707,7 +707,7 @@ export default function App() {
             e.preventDefault();
             navigateToPage('home');
           }}
-          className="font-display text-lg font-bold tracking-tight text-white hover:text-blue-400 transition-colors whitespace-nowrap shrink-0"
+          className="font-display text-base sm:text-lg font-bold tracking-tight text-white hover:text-blue-400 transition-colors whitespace-nowrap shrink-0 truncate max-w-[130px] xs:max-w-[170px] sm:max-w-none"
         >
           {personal.fullName}
         </a>
@@ -795,7 +795,7 @@ export default function App() {
         </nav>
 
         {/* Zone 3: PWA Install, Audio FX, Language Switcher, Theme, Flame & Primary Action */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0 max-w-full overflow-x-auto no-scrollbar py-0.5">
           {/* PWA Install Button */}
           <PWAInstallButton lang={language} alphabetMode={alphabetMode} />
 
@@ -1274,7 +1274,7 @@ export default function App() {
 
               {/* Primary CTAs & Official Links Row */}
               <div className="space-y-6 pt-2">
-                <div className="flex flex-wrap items-center gap-3.5">
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-3.5 max-w-full">
                   <motion.a
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -1283,7 +1283,7 @@ export default function App() {
                       e.preventDefault();
                       navigateToPage('loyihalar');
                     }}
-                    className="px-5 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 shadow-lg shadow-blue-600/20"
+                    className="w-full sm:w-auto justify-center px-5 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 shadow-lg shadow-blue-600/20"
                   >
                     {tr('GitHub loyihalarim')} <ArrowUpRight className="w-4 h-4" />
                   </motion.a>
@@ -1293,7 +1293,7 @@ export default function App() {
                     whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => setIsCardModalOpen(true)}
-                    className="px-5 py-3 text-sm font-medium text-zinc-100 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+                    className="w-full sm:w-auto justify-center px-5 py-3 text-sm font-medium text-zinc-100 bg-[#0F0F12] border border-zinc-800 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     <QrCode className="w-4 h-4 text-blue-500" /> {tr('Barcha havolalar & QR')}
                   </motion.button>
@@ -1303,15 +1303,15 @@ export default function App() {
                     whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={handleCopyEmail}
-                    className="px-4 py-3 text-sm font-medium text-zinc-300 bg-transparent border border-zinc-800/80 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+                    className="w-full sm:w-auto justify-center px-4 py-3 text-sm font-medium text-zinc-300 bg-transparent border border-zinc-800/80 rounded-lg hover:border-zinc-700 hover:text-white transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer min-w-0"
                   >
                     {copiedEmail ? (
                       <>
-                        <Check className="w-4 h-4 text-emerald-400" /> {tr('Email nusxalandi')}
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0" /> {tr('Email nusxalandi')}
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4 text-zinc-400" /> {personal.email}
+                        <Copy className="w-4 h-4 text-zinc-400 shrink-0" /> <span className="truncate max-w-[200px] xs:max-w-none">{personal.email}</span>
                       </>
                     )}
                   </motion.button>

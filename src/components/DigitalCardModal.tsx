@@ -105,7 +105,7 @@ export const DigitalCardModal: React.FC<DigitalCardModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-2xl rounded-2xl bg-[#0F0F12] border border-zinc-800 p-6 md:p-8 text-zinc-100 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0F0F12] border border-zinc-800 p-5 sm:p-6 md:p-8 text-zinc-100 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Subtle top ambient accent */}

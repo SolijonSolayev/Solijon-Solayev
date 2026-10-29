@@ -178,9 +178,13 @@ export default function App() {
     if (themeMode === 'light') {
       root.classList.remove('dark');
       root.classList.add('light');
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) themeMeta.setAttribute('content', '#FAF4E5');
     } else {
       root.classList.remove('light');
       root.classList.add('dark');
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) themeMeta.setAttribute('content', '#050505');
     }
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);

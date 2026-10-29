@@ -42,6 +42,8 @@ import {
   Terminal,
   Trash2,
   Video,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { AdminPanelView } from './components/AdminPanelView';
 import { BlogArticleView, formatUzbekDate } from './components/BlogArticleView';
@@ -78,6 +80,8 @@ import {
 import { downloadVCard } from './utils/vcard';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
+export type ThemeMode = 'dark' | 'light';
+export const THEME_STORAGE_KEY = 'solijon_theme_mode';
 
 function resolvePageFromHash(hash: string, search: string = ''): ActiveSectionPage {
   try {
@@ -155,6 +159,38 @@ export default function App() {
     } catch {
       // ignore storage errors
     }
+  };
+
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    try {
+      const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'light' || saved === 'dark') {
+        return saved;
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return 'dark'; // DEFAULT TUN REJIMI
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (themeMode === 'light') {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+      root.classList.add('dark');
+    }
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    } catch {
+      // ignore storage errors
+    }
+  }, [themeMode]);
+
+  const toggleThemeMode = () => {
+    setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const tr = (text: string) => formatUzbekText(text, alphabetMode);
@@ -515,6 +551,8 @@ export default function App() {
           }}
           isAdmin={isAdmin}
           onEditPostInAdmin={(postId) => openAdminPanel(postId)}
+          themeMode={themeMode}
+          onToggleTheme={toggleThemeMode}
         />
         <PortfolioChatbot
           profile={profile}
@@ -528,6 +566,8 @@ export default function App() {
           onClose={() => setIsCommandPaletteOpen(false)}
           profile={profile}
           alphabetMode={alphabetMode}
+          themeMode={themeMode}
+          onToggleTheme={toggleThemeMode}
           onToggleAlphabet={() =>
             handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
           }
@@ -566,7 +606,7 @@ export default function App() {
       <motion.div
         aria-hidden="true"
         style={{ y: ambientGlowY }}
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[780px] h-[360px] bg-blue-600/10 blur-[140px] rounded-full z-0 will-change-transform"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[780px] h-[360px] bg-blue-600/10 blur-[140px] rounded-full z-0 will-change-transform ambient-glow-aura"
       />
 
       {/* 3-Zone Top Bar Contract */}
@@ -665,8 +705,37 @@ export default function App() {
           </a>
         </nav>
 
-        {/* Zone 3: Flame cursor toggle & primary action */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Zone 3: Theme mode, Flame cursor toggle & primary action */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Dual Theme Mode Toggle: Tun (Default) / Kun (Hashamatli oq-sariq) */}
+          <button
+            type="button"
+            onClick={toggleThemeMode}
+            title={
+              themeMode === 'dark'
+                ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
+                : tr("Tungi rejimga o'tish (Qorong'i)")
+            }
+            aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+            className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+              themeMode === 'light'
+                ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
+                : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
+            }`}
+          >
+            {themeMode === 'dark' ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">{tr('Kun')}</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-amber-700" />
+                <span className="hidden sm:inline">{tr('Tun')}</span>
+              </>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={toggleFlameCursor}
@@ -728,6 +797,23 @@ export default function App() {
                 {tr(tab.label)}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={toggleThemeMode}
+              title={themeMode === 'dark' ? tr("Kunduzgi hashamatli rejim") : tr("Tungi rejim")}
+              className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer inline-flex items-center gap-1 border ${
+                themeMode === 'light'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-900'
+                  : 'text-zinc-400 hover:text-white bg-[#0F0F12] border-zinc-800'
+              }`}
+            >
+              {themeMode === 'dark' ? (
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+              ) : (
+                <Moon className="w-3.5 h-3.5 text-amber-700" />
+              )}
+              <span>{themeMode === 'dark' ? tr('Kun') : tr('Tun')}</span>
+            </button>
           </div>
         </div>
 
@@ -798,6 +884,34 @@ export default function App() {
                     );
                   })}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={toggleThemeMode}
+                  title={
+                    themeMode === 'dark'
+                      ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
+                      : tr("Tungi rejimga o'tish (Qorong'i)")
+                  }
+                  aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+                  className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                    themeMode === 'light'
+                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
+                      : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  {themeMode === 'dark' ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{tr('Kun')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-amber-700" />
+                      <span>{tr('Tun')}</span>
+                    </>
+                  )}
+                </button>
 
                 <button
                   type="button"
@@ -879,6 +993,34 @@ export default function App() {
                   );
                 })}
               </div>
+
+              <button
+                type="button"
+                onClick={toggleThemeMode}
+                title={
+                  themeMode === 'dark'
+                    ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
+                    : tr("Tungi rejimga o'tish (Qorong'i)")
+                }
+                aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+                className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                  themeMode === 'light'
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
+                    : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
+                }`}
+              >
+                {themeMode === 'dark' ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{tr('Kun')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-amber-700" />
+                    <span>{tr('Tun')}</span>
+                  </>
+                )}
+              </button>
 
               <button
                 type="button"
@@ -2708,6 +2850,8 @@ export default function App() {
         onClose={() => setIsCommandPaletteOpen(false)}
         profile={profile}
         alphabetMode={alphabetMode}
+        themeMode={themeMode}
+        onToggleTheme={toggleThemeMode}
         onToggleAlphabet={() =>
           handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
         }

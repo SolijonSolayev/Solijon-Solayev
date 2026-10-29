@@ -20,6 +20,8 @@ import {
   Square,
   User as UserIcon,
   Volume2,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { BlogPostItem, ProfileData } from '../types/profile';
 import { formatUzbekText, UzbekAlphabetMode } from '../utils/uzbekAlphabet';
@@ -368,6 +370,8 @@ interface BlogArticleViewProps {
   onSelectPost: (postId: string) => void;
   isAdmin: boolean;
   onEditPostInAdmin: (postId: string) => void;
+  themeMode?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 export const BlogArticleView: React.FC<BlogArticleViewProps> = ({
@@ -380,6 +384,8 @@ export const BlogArticleView: React.FC<BlogArticleViewProps> = ({
   onSelectPost,
   isAdmin,
   onEditPostInAdmin,
+  themeMode = 'dark',
+  onToggleTheme,
 }) => {
   const [imgFailed, setImgFailed] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -618,6 +624,36 @@ ${post.content}
               Oʻ Gʻ Sh Ch
             </button>
           </div>
+
+          {onToggleTheme && (
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              title={
+                themeMode === 'dark'
+                  ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
+                  : tr("Tungi rejimga o'tish (Qorong'i)")
+              }
+              aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+              className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                themeMode === 'light'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
+                  : 'bg-[#0F0F12] border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700'
+              }`}
+            >
+              {themeMode === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">{tr('Kun')}</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-amber-700" />
+                  <span className="hidden sm:inline">{tr('Tun')}</span>
+                </>
+              )}
+            </button>
+          )}
 
           {isAdmin && (
             <button

@@ -14,6 +14,8 @@ import {
   Check,
   Copy,
   Languages,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { ProfileData, BlogPostItem, ProjectItem } from '../types/profile';
 import { UzbekAlphabetMode, formatUzbekText } from '../utils/uzbekAlphabet';
@@ -24,6 +26,8 @@ interface CommandPaletteModalProps {
   profile: ProfileData;
   alphabetMode: UzbekAlphabetMode;
   onToggleAlphabet: () => void;
+  themeMode?: 'dark' | 'light';
+  onToggleTheme?: () => void;
   onSelectBlogPost: (post: BlogPostItem) => void;
   onSelectProject: (project: ProjectItem) => void;
   onDownloadVCard: () => void;
@@ -52,6 +56,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onDownloadVCard,
   onOpenQrModal,
   onOpenAiChat,
+  themeMode = 'dark',
+  onToggleTheme,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -87,6 +93,30 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           onClose();
         },
       },
+      ...(onToggleTheme
+        ? [
+            {
+              id: 'act-theme',
+              group: 'actions' as const,
+              title:
+                themeMode === 'dark'
+                  ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq / Oltin-qum)")
+                  : tr("Tungi rejimga o'tish (Qorong'i)"),
+              subtitle: tr("Sayt ko'rinish va rang uslubini almashtirish"),
+              keywords: 'tema theme rejim kun tun light dark rang kunduzgi',
+              icon:
+                themeMode === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-amber-700" />
+                ),
+              onSelect: () => {
+                onToggleTheme();
+                onClose();
+              },
+            },
+          ]
+        : []),
       {
         id: 'act-ai-chat',
         group: 'actions',

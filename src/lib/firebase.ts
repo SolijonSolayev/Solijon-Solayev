@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { getAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 import {
   GoogleAuthProvider,
   User,
@@ -28,11 +29,28 @@ import { DEFAULT_PROFILE_DATA } from '../data/defaultProfile';
 import { ProfileData } from '../types/profile';
 
 export const ADMIN_EMAIL = 'solijonsolayev2003@gmail.com';
+export const FIREBASE_PROJECT_ID = firebaseConfig.projectId;
+export const FIRESTORE_DATABASE_ID = firebaseConfig.firestoreDatabaseId;
 const PORTFOLIO_DOC_ID = 'solijon_v3';
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp({
+  ...firebaseConfig,
+  measurementId: firebaseConfig.measurementId || 'G-047NZXKJ8Z',
+});
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
+
+if (typeof window !== 'undefined') {
+  isAnalyticsSupported()
+    .then((supported) => {
+      if (supported) {
+        getAnalytics(app);
+      }
+    })
+    .catch(() => {
+      // Ignore analytics errors in restricted iframe/adblock environments
+    });
+}
 
 export enum OperationType {
   CREATE = 'create',

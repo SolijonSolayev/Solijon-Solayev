@@ -7,8 +7,10 @@ import {
   BookOpen,
   Check,
   Code2,
+  Copy,
   Download,
   Edit3,
+  ExternalLink,
   Eye,
   FileText,
   Heading2,
@@ -32,6 +34,8 @@ import {
 import {
   ADMIN_EMAIL,
   ContactInquiryRecord,
+  FIREBASE_PROJECT_ID,
+  FIRESTORE_DATABASE_ID,
   deleteInquiry,
   isUserVerifiedAdmin,
   savePortfolioToFirestore,
@@ -146,6 +150,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [showDomainHelp, setShowDomainHelp] = useState(false);
+  const [copiedField, setCopiedField] = useState<'domain' | 'project' | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
 
   // Blog Admin Editor & Auto-Populated Form State
@@ -247,10 +253,19 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
         );
       }
     } catch (err) {
-      setAuthError(
-        err instanceof Error ? err.message : tr('Google orqali kirishda xatolik yuz berdi.')
-      );
+      const message =
+        err instanceof Error ? err.message : tr('Google orqali kirishda xatolik yuz berdi.');
+      setAuthError(message);
+      if (message.includes('auth/unauthorized-domain')) {
+        setShowDomainHelp(true);
+      }
     }
+  };
+
+  const handleCopyText = (text: string, field: 'domain' | 'project') => {
+    navigator.clipboard?.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2200);
   };
 
   const handleSaveToCloud = async (
@@ -649,6 +664,13 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
   };
 
   if (!isAdmin) {
+    const currentHostname =
+      typeof window !== 'undefined' ? window.location.hostname : 'sizning-saytingiz.vercel.app';
+    const isUnauthorizedDomainError = Boolean(
+      authError && authError.includes('auth/unauthorized-domain')
+    );
+    const firebaseAuthSettingsUrl = `https://console.firebase.google.com/project/${FIREBASE_PROJECT_ID}/authentication/settings`;
+
     return (
       <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col">
         <header className="flex items-center justify-between gap-8 px-6 lg:px-12 py-4 border-b border-zinc-800">
@@ -691,7 +713,7 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
         </header>
 
         <div className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-md rounded-2xl bg-[#0F0F12] border border-zinc-800 p-8 space-y-6">
+          <div className="w-full max-w-lg rounded-2xl bg-[#0F0F12] border border-zinc-800 p-8 space-y-6">
             <div className="w-12 h-12 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center">
               <Lock className="w-6 h-6 text-blue-500" />
             </div>
@@ -722,12 +744,19 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
             )}
 
             {authError && (
-              <p className="text-xs text-rose-400 bg-rose-950/30 border border-rose-900/50 rounded-lg p-3">
-                {tr(authError)}
-              </p>
+              <div className="text-xs text-rose-300 bg-rose-950/35 border border-rose-800/60 rounded-xl p-4 space-y-2">
+                <p className="font-semibold text-rose-400">{tr(authError)}</p>
+                {isUnauthorizedDomainError && (
+                  <p className="text-zinc-300 leading-relaxed">
+                    {tr(
+                      "Vercel yoki yangi domenga yuklanganda Firebase xavfsizlik tizimi ushbu domenni (Authorized domains) ro'yxatiga qo'shishingizni talab qiladi. Quyidagi yo'riqnoma orqali 30 soniyada hal qiling:"
+                    )}
+                  </p>
+                )}
+              </div>
             )}
 
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-1">
               <button
                 type="button"
                 onClick={handleLogin}
@@ -745,7 +774,128 @@ Bu yerda maqolangizning asosiy kirish qismini yozishingiz mumkin. Matn ichida **
                   {tr('Joriy hisobdan chiqish')}
                 </button>
               )}
+
+              <button
+                type="button"
+                onClick={() => setShowDomainHelp((prev) => !prev)}
+                className="w-full py-2 px-3 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+              >
+                {showDomainHelp || isUnauthorizedDomainError
+                  ? tr("Vercel / Firebase domen yo'riqnomasini yopish")
+                  : tr('Vercel da "auth/unauthorized-domain" xatosi chiqyaptimi?')}
+              </button>
             </div>
+
+            {(showDomainHelp || isUnauthorizedDomainError) && (
+              <div className="p-4 rounded-xl bg-zinc-900/90 border border-zinc-800 space-y-3.5 text-xs">
+                <div className="space-y-1">
+                  <p className="font-semibold text-zinc-100">
+                    {tr('Firebase Loyiha maʼlumotlari va Domen ruxsati')}
+                  </p>
+                  <p className="text-zinc-400 leading-relaxed">
+                    {tr(
+                      "AI Studio ushbu sayt bazasini Google Cloud / Firebase ichida avtomatik yaratgan. Loyiha nomi va joriy domenni nusxalab Firebase Console ichiga qo'shing:"
+                    )}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[#050505] border border-zinc-800">
+                    <div className="min-w-0">
+                      <span className="block text-[10px] uppercase tracking-wider text-zinc-500">
+                        {tr('1. Firebase Project ID (Loyiha nomi)')}
+                      </span>
+                      <code className="text-xs font-mono-tabular text-blue-400 break-all">
+                        {FIREBASE_PROJECT_ID}
+                      </code>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyText(FIREBASE_PROJECT_ID, 'project')}
+                      className="px-2.5 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 inline-flex items-center gap-1 shrink-0 cursor-pointer"
+                    >
+                      {copiedField === 'project' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{tr('Nusxalandi')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>{tr('Nusxalash')}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[#050505] border border-zinc-800">
+                    <div className="min-w-0">
+                      <span className="block text-[10px] uppercase tracking-wider text-zinc-500">
+                        {tr("2. Qo'shiladigan Domen (Authorized Domain)")}
+                      </span>
+                      <code className="text-xs font-mono-tabular text-emerald-400 break-all">
+                        {currentHostname}
+                      </code>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyText(currentHostname, 'domain')}
+                      className="px-2.5 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 inline-flex items-center gap-1 shrink-0 cursor-pointer"
+                    >
+                      {copiedField === 'domain' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{tr('Nusxalandi')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>{tr('Nusxalash')}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-[#050505] border border-zinc-800/70">
+                    <span className="block text-[10px] uppercase tracking-wider text-zinc-500">
+                      {tr('Firestore Database ID')}
+                    </span>
+                    <code className="text-[11px] font-mono-tabular text-zinc-400 break-all">
+                      {FIRESTORE_DATABASE_ID}
+                    </code>
+                  </div>
+                </div>
+
+                <ol className="list-decimal list-inside space-y-1.5 text-zinc-300 leading-relaxed">
+                  <li>
+                    {tr('Quyidagi koʻk tugma orqali toʻgʻridan-toʻgʻri')}{' '}
+                    <strong className="text-white">{FIREBASE_PROJECT_ID}</strong>{' '}
+                    {tr('loyihasining Authentication sozlamalarini oching.')}
+                  </li>
+                  <li>
+                    <strong className="text-white">Authorized domains</strong>{' '}
+                    {tr('boʻlimidan')}{' '}
+                    <strong className="text-white">Add domain</strong>{' '}
+                    {tr('tugmasini bosing.')}
+                  </li>
+                  <li>
+                    {tr('Vercel domeningizni')}{' '}
+                    <code className="text-emerald-400">{currentHostname}</code>{' '}
+                    {tr("ko'rinishida (https:// siz) qo'shib saqlang.")}
+                  </li>
+                </ol>
+
+                <a
+                  href={firebaseAuthSettingsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-300 hover:bg-blue-600/30 hover:text-white transition-colors inline-flex items-center justify-center gap-2 font-medium"
+                >
+                  <span>{tr('Firebase Console → Authorized Domains ni ochish')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -48,7 +48,9 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { AdminPanelView } from './components/AdminPanelView';
+import { BeamWordmarkFooter } from '@/components/ui/beam-wordmark-footer';
 import { BlogArticleView, formatUzbekDate } from './components/BlogArticleView';
+import { Card10 } from '@/components/ui/card-10';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { DigitalCardModal } from './components/DigitalCardModal';
 import { FlameCursor } from './components/FlameCursor';
@@ -1457,27 +1459,38 @@ export default function App() {
             </motion.div>
           </div>
 
-          {/* Full-Width 4-Column Summary Row Below Hero Split with Subtle Scroll Drift */}
+          {/* Full-Width 4-Column Summary Row Below Hero Split using Card10 Statistics Cards */}
           <motion.div
             style={{ y: heroMetricsY }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pt-10 border-t border-zinc-800/80 will-change-transform"
           >
-            {profile.metrics.map((item, idx) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.35, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-1 group"
-              >
-                <p className="font-display text-2xl lg:text-3xl font-bold text-white group-hover:text-blue-400 transition-colors tracking-tight">
-                  {item.value}
-                </p>
-                <p className="text-sm font-medium text-zinc-200">{item.label}</p>
-                <p className="text-xs text-zinc-500">{item.context}</p>
-              </motion.div>
-            ))}
+            {profile.metrics.map((item, idx) => {
+              const icons = [
+                <Briefcase key="0" className="w-5 h-5 text-blue-400" />,
+                <Layers key="1" className="w-5 h-5 text-blue-400" />,
+                <Globe key="2" className="w-5 h-5 text-blue-400" />,
+                <Code2 key="3" className="w-5 h-5 text-blue-400" />,
+              ];
+              const categories = [tr('Tajriba'), tr('Loyihalar'), tr('Viki-Faoliyat'), tr('Ochiq Kod')];
+              const badges = ['3+ Yil', 'Full-Stack', 'CC BY-SA', 'Open-Source'];
+
+              return (
+                <Card10
+                  key={item.id}
+                  title={item.label}
+                  value={item.value}
+                  description={item.context}
+                  category={categories[idx % categories.length]}
+                  badge={badges[idx % badges.length]}
+                  icon={icons[idx % icons.length]}
+                  onClick={() => {
+                    if (idx === 1) navigateToPage('loyihalar');
+                    if (idx === 2) navigateToPage('tajriba');
+                  }}
+                  actionText={idx === 1 ? tr('Loyihalarni koʻrish') : idx === 2 ? tr('Faoliyatni koʻrish') : undefined}
+                />
+              );
+            })}
           </motion.div>
         </section>
 
@@ -1540,57 +1553,20 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {profile.projects.slice(0, 2).map((project) => {
-                const hasImgFailed = failedProjectImages[project.id];
-                return (
-                  <SpotlightCard
-                    key={project.id}
-                    as="article"
-                    onClick={() => setActiveProjectId(project.id)}
-                    className="group rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden flex flex-col justify-between transition-colors cursor-pointer"
-                  >
-                    <div className="relative aspect-16/9 w-full overflow-hidden bg-[#050505] border-b border-zinc-800">
-                      {!hasImgFailed && project.imageUrl ? (
-                        <img
-                          src={project.imageUrl}
-                          alt={project.title}
-                          referrerPolicy="no-referrer"
-                          onError={() =>
-                            setFailedProjectImages((prev) => ({ ...prev, [project.id]: true }))
-                          }
-                          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
-                          <Layers className="w-8 h-8 text-blue-500" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none" />
-                      <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between gap-2 text-xs text-zinc-200">
-                        <span className="font-mono-tabular text-blue-400">
-                          {project.impactMetric}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-white font-medium">
-                          {tr('Batafsil')} <ArrowUpRight className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-5 space-y-2.5">
-                      <div className="flex items-center gap-2 text-xs text-zinc-400">
-                        <span>{tr(project.category)}</span>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-mono-tabular">{project.year}</span>
-                      </div>
-                      <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
-                        {project.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
-                        {project.summary}
-                      </p>
-                    </div>
-                  </SpotlightCard>
-                );
-              })}
+              {profile.projects.slice(0, 2).map((project) => (
+                <Card10
+                  key={project.id}
+                  title={project.title}
+                  value={project.impactMetric}
+                  description={project.summary}
+                  category={project.category}
+                  badge={project.year}
+                  imageUrl={project.imageUrl}
+                  subMetrics={project.technologies.slice(0, 2).map((t) => ({ label: tr('Texnologiya'), value: t }))}
+                  actionText={tr('Toʻliq tafsilotlar')}
+                  onClick={() => setActiveProjectId(project.id)}
+                />
+              ))}
             </div>
           </div>
 
@@ -1688,66 +1664,30 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SpotlightCard
-                as="div"
+              <Card10
+                title={tr('Tajriba va Xronologiya')}
+                value={profile.experience[0]?.period || '2023 - Hozirgacha'}
+                description={profile.experience[0]?.description || tr('Professional dasturlash va ochiq kodli loyihalar')}
+                category={tr('Xronologiya')}
+                badge="3+ Yil"
+                subMetrics={profile.experience.slice(0, 2).map((exp) => ({ label: exp.company, value: exp.role }))}
+                actionText={tr("To'liq faoliyat xronologiyasi")}
                 onClick={() => navigateToPage('tajriba')}
-                className="p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 transition-colors cursor-pointer space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono-tabular text-blue-400">
-                    {tr('Tajriba va Xronologiya')}
-                  </span>
-                  <ArrowUpRight className="w-4 h-4 text-zinc-500" />
-                </div>
-                <div className="divide-y divide-zinc-800/80">
-                  {profile.experience.slice(0, 2).map((exp) => (
-                    <div key={exp.id} className="py-3 first:pt-0 last:pb-0 space-y-1">
-                      <div className="flex items-center justify-between gap-2 text-xs">
-                        <span className="font-semibold text-white">{exp.role}</span>
-                        <span className="font-mono-tabular text-blue-400 shrink-0">
-                          {exp.period}
-                        </span>
-                      </div>
-                      <p className="text-xs text-zinc-400">{exp.company}</p>
-                    </div>
-                  ))}
-                </div>
-              </SpotlightCard>
+              />
 
-              <SpotlightCard
-                as="div"
+              <Card10
+                title={tr("Texnik Stack & Ekotizim")}
+                value="React · TypeScript · Python"
+                description={tr("Frontend arxitektura, Python/PowerShell tizim avtomatizatsiyasi va Vikipediya erkin bilim ulashish faoliyati.")}
+                category={tr('Texnologiyalar')}
+                badge="Full-Stack"
+                subMetrics={[
+                  { label: 'Platforma', value: 'Solaris 3D / Tilimlo' },
+                  { label: 'Ochiq Kod', value: 'GitHub & Vikiombor' },
+                ]}
+                actionText={tr("Jonli ekotizim va tajribani ko'rish")}
                 onClick={() => navigateToPage('tajriba')}
-                className="p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 transition-colors cursor-pointer flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono-tabular text-blue-400">
-                      {tr("Texnik Stack & Jonli GitHub / Vikipediya API")}
-                    </span>
-                    <ArrowUpRight className="w-4 h-4 text-zinc-500" />
-                  </div>
-                  <p className="text-sm text-zinc-300 leading-relaxed">
-                    {tr(
-                      "Frontend arxitektura (React, TypeScript, Three.js), Python/PowerShell tizim avtomatizatsiyasi hamda O'zbekcha Vikipediya va Vikiombordagi real-vaqt tahrirlar statistikasi."
-                    )}
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono-tabular text-zinc-400">
-                  {profile.skillGroups
-                    .flatMap((g) => g.items)
-                    .slice(0, 7)
-                    .map((skill, idx, arr) => (
-                      <React.Fragment key={skill}>
-                        <span className="text-zinc-200">{skill}</span>
-                        {idx < arr.length - 1 && (
-                          <span aria-hidden="true" className="text-zinc-600">
-                            ·
-                          </span>
-                        )}
-                      </React.Fragment>
-                    ))}
-                </div>
-              </SpotlightCard>
+              />
             </div>
           </div>
 
@@ -1825,43 +1765,20 @@ export default function App() {
                 offsetY={idx % 2 === 0 ? [18, -16] : [28, -12]}
                 className="h-full"
               >
-                <SpotlightCard className="h-full p-6 lg:p-8 rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-zinc-700 transition-colors space-y-6">
-                  <div className="space-y-3">
-                    <h3 className="font-display text-lg lg:text-xl font-semibold text-white">
-                      <span className="font-mono-tabular text-blue-500 mr-2">{service.number}</span>
-                      {service.title}
-                    </h3>
-                    <p className="text-sm text-zinc-300 leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4 pt-4 border-t border-zinc-800/80">
-                    <ul className="space-y-1.5 text-xs text-zinc-400">
-                      {service.deliverables.map((item) => (
-                        <li key={item} className="flex items-center gap-2">
-                          <span className="text-blue-500" aria-hidden="true">
-                            /
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono-tabular text-zinc-400 pt-2">
-                      {service.technologies.map((tech, tIdx) => (
-                        <React.Fragment key={tech}>
-                          <span className="text-zinc-200">{tech}</span>
-                          {tIdx < service.technologies.length - 1 && (
-                            <span aria-hidden="true" className="text-zinc-600">
-                              ·
-                            </span>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </SpotlightCard>
+                <Card10
+                  title={service.title}
+                  value={service.number}
+                  description={service.description}
+                  category={tr('Yoʻnalish')}
+                  badge={service.technologies[0] || 'Dasturlash'}
+                  subMetrics={service.deliverables.slice(0, 2).map((del) => ({
+                    label: tr('Natija'),
+                    value: del,
+                  }))}
+                  actionText={tr('Murojaat va bogʻlanish')}
+                  onClick={() => navigateToPage('boglanish')}
+                  className="h-full"
+                />
               </ParallaxLayer>
             ))}
           </div>
@@ -1967,76 +1884,21 @@ export default function App() {
                     className={isWide ? 'lg:col-span-2 lg:row-span-2' : 'col-span-1 row-span-1'}
                   >
                     <ParallaxLayer offsetY={cardParallaxOffset} className="h-full">
-                      <SpotlightCard
-                        as="article"
+                      <Card10
+                        title={project.title}
+                        value={project.impactMetric}
+                        description={project.summary}
+                        category={project.category}
+                        badge={`${project.year} · ${project.client}`}
+                        imageUrl={project.imageUrl}
+                        subMetrics={project.technologies.slice(0, 4).map((tech) => ({
+                          label: 'Tech',
+                          value: tech,
+                        }))}
+                        actionText={tr('Batafsil loyiha sahifasi')}
                         onClick={() => setActiveProjectId(project.id)}
-                        className="group h-full rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden flex flex-col justify-between transition-colors cursor-pointer"
-                      >
-                        <div
-                          className={`relative w-full overflow-hidden bg-[#050505] border-b border-zinc-800 ${
-                            isWide ? 'aspect-video' : 'aspect-4/3'
-                          }`}
-                        >
-                          {!hasImgFailed && project.imageUrl ? (
-                            <ParallaxImage
-                              src={project.imageUrl}
-                              alt={project.title}
-                              onError={() =>
-                                setFailedProjectImages((prev) => ({ ...prev, [project.id]: true }))
-                              }
-                              intensity={16}
-                              className="group-hover:scale-[1.03] transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505] text-center">
-                              <Layers className="w-8 h-8 text-blue-500 mb-2" />
-                              <span className="text-xs text-zinc-400">{tr(project.category)}</span>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none" />
-                          <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between gap-2 text-xs text-zinc-200">
-                            <span className="font-mono-tabular text-blue-400">
-                              {project.impactMetric}
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-white font-medium group-hover:translate-x-0.5 transition-transform">
-                              {tr('Batafsil')} <ArrowUpRight className="w-3.5 h-3.5" />
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-xs text-zinc-400">
-                              <span>{tr(project.category)}</span>
-                              <span aria-hidden="true">·</span>
-                              <span className="font-mono-tabular">{project.year}</span>
-                              <span aria-hidden="true">·</span>
-                              <span>{project.client}</span>
-                            </div>
-
-                            <h3 className="font-display text-lg lg:text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
-                              {project.title}
-                            </h3>
-
-                            <p className="text-sm text-zinc-400 leading-relaxed line-clamp-3">
-                              {project.summary}
-                            </p>
-                          </div>
-
-                          <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono-tabular text-zinc-400">
-                            {project.technologies.map((tech, idx) => (
-                              <React.Fragment key={tech}>
-                                <span>{tech}</span>
-                                {idx < project.technologies.length - 1 && (
-                                  <span aria-hidden="true" className="text-zinc-600">
-                                    ·
-                                  </span>
-                                )}
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </SpotlightCard>
+                        className="h-full"
+                      />
                     </ParallaxLayer>
                   </motion.div>
                 );
@@ -2990,30 +2852,17 @@ export default function App() {
         )}
       </main>
 
-      {/* Quiet Editorial Footer */}
-      <footer className="relative z-10 border-t border-zinc-800/80 bg-[#050505] px-6 lg:px-12 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-300 font-medium">{personal.fullName}</span>
-            <span aria-hidden="true">·</span>
-            <span>{personal.role}</span>
-            <span aria-hidden="true">·</span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {personal.location}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              onClick={() => downloadVCard(profile)}
-              className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
-            >
-              {tr('vCard (.vcf) yuklash')}
-            </button>
-          </div>
-        </div>
-      </footer>
+      {/* Light Beam Footer with Giant Wordmark */}
+      <BeamWordmarkFooter
+        profile={profile}
+        alphabetMode={alphabetMode}
+        language={language}
+        onNavigate={navigateToPage}
+        onDownloadVCard={() => downloadVCard(profile)}
+        onOpenQrModal={() => setIsCardModalOpen(true)}
+        onOpenAiChat={() => setIsChatbotOpen(true)}
+        wordmarkText="SOLIJON SOLAYEV"
+      />
 
       {/* Interactive Modals */}
       <DigitalCardModal

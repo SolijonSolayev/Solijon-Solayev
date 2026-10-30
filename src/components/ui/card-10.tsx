@@ -82,8 +82,8 @@ export const Card10: React.FC<Card10Props> = ({
             <img
               src={imageUrl}
               alt={title}
-              width={720}
-              height={405}
+              width={560}
+              height={315}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"

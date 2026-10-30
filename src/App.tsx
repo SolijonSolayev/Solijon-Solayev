@@ -415,7 +415,16 @@ export default function App() {
   useEffect(() => {
     let unsubPortfolio: (() => void) | null = null;
     let cancelled = false;
-    const timer = window.setTimeout(() => {
+    let syncStarted = false;
+
+    const startPortfolioSync = () => {
+      if (syncStarted || cancelled) return;
+      syncStarted = true;
+      window.removeEventListener('pointerdown', startPortfolioSync);
+      window.removeEventListener('pointermove', startPortfolioSync);
+      window.removeEventListener('keydown', startPortfolioSync);
+      window.removeEventListener('scroll', startPortfolioSync);
+      window.removeEventListener('touchstart', startPortfolioSync);
       void import('./lib/firebase').then(({ subscribeToPortfolio }) => {
         if (cancelled) return;
         unsubPortfolio = subscribeToPortfolio((cloudProfile) => {
@@ -424,7 +433,17 @@ export default function App() {
           }
         });
       });
-    }, 2200);
+    };
+
+    if (window.location.hash === '#admin') {
+      startPortfolioSync();
+    } else {
+      window.addEventListener('pointerdown', startPortfolioSync, { once: true, passive: true });
+      window.addEventListener('pointermove', startPortfolioSync, { once: true, passive: true });
+      window.addEventListener('keydown', startPortfolioSync, { once: true, passive: true });
+      window.addEventListener('scroll', startPortfolioSync, { once: true, passive: true });
+      window.addEventListener('touchstart', startPortfolioSync, { once: true, passive: true });
+    }
 
     const handleUrlStateChange = () => {
       const hash = window.location.hash;
@@ -452,7 +471,11 @@ export default function App() {
 
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
+      window.removeEventListener('pointerdown', startPortfolioSync);
+      window.removeEventListener('pointermove', startPortfolioSync);
+      window.removeEventListener('keydown', startPortfolioSync);
+      window.removeEventListener('scroll', startPortfolioSync);
+      window.removeEventListener('touchstart', startPortfolioSync);
       if (unsubPortfolio) unsubPortfolio();
       window.removeEventListener('hashchange', handleUrlStateChange);
       window.removeEventListener('popstate', handleUrlStateChange);
@@ -616,9 +639,26 @@ export default function App() {
       }
     }
 
-    syncGithubProjects();
+    let ghStarted = false;
+    const triggerGithubSync = () => {
+      if (ghStarted || !isMounted) return;
+      ghStarted = true;
+      window.removeEventListener('pointerdown', triggerGithubSync);
+      window.removeEventListener('pointermove', triggerGithubSync);
+      window.removeEventListener('scroll', triggerGithubSync);
+      window.removeEventListener('touchstart', triggerGithubSync);
+      void syncGithubProjects();
+    };
+    window.addEventListener('pointerdown', triggerGithubSync, { once: true, passive: true });
+    window.addEventListener('pointermove', triggerGithubSync, { once: true, passive: true });
+    window.addEventListener('scroll', triggerGithubSync, { once: true, passive: true });
+    window.addEventListener('touchstart', triggerGithubSync, { once: true, passive: true });
     return () => {
       isMounted = false;
+      window.removeEventListener('pointerdown', triggerGithubSync);
+      window.removeEventListener('pointermove', triggerGithubSync);
+      window.removeEventListener('scroll', triggerGithubSync);
+      window.removeEventListener('touchstart', triggerGithubSync);
     };
   }, []);
 
@@ -1350,10 +1390,7 @@ export default function App() {
               className="max-w-7xl mx-auto px-6 lg:px-12 pt-10 pb-16 lg:pt-16 lg:pb-24"
             >
           {/* Role, Status & Dual Uzbek Alphabet Switcher Row */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          <div
             className="flex flex-wrap items-center justify-between gap-4 pb-8 mb-8 border-b border-zinc-800/80"
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
@@ -1485,16 +1522,13 @@ export default function App() {
                 {language === 'en' ? 'Download vCard (.vcf)' : tr('vCard (.vcf) yuklash')}
               </motion.button>
             </div>
-          </motion.div>
+          </div>
 
           {/* 2-Column Split-Screen Hero with Counter-Balanced Parallax */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
             {/* Left Column: Typographic Hierarchy with Upward Parallax Drift */}
             <motion.div
               style={{ y: heroLeftY }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-7 flex flex-col justify-between space-y-8 will-change-transform"
             >
               <div className="space-y-5">
@@ -1643,9 +1677,6 @@ export default function App() {
             {/* Right Column: Interactive 3D Tilt + Scroll Parallax Showcase Card */}
             <motion.div
               style={{ y: heroRightY }}
-              initial={{ opacity: 0, scale: 0.96, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 flex will-change-transform"
             >
               <SpotlightCard

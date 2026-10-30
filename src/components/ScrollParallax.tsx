@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import React from 'react';
 
 interface ParallaxOffsetProps {
   children: React.ReactNode;
@@ -8,38 +7,13 @@ interface ParallaxOffsetProps {
 }
 
 /**
- * Smooth GPU-composited vertical parallax container bound to its own viewport scroll progress.
+ * Lightweight container that avoids forced layout reflows on initial page load.
  */
 export const ParallaxLayer: React.FC<ParallaxOffsetProps> = ({
   children,
-  offsetY = [24, -24],
   className = '',
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const prefersReducedMotion = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 110,
-    damping: 28,
-    mass: 0.35,
-  });
-
-  const y = useTransform(
-    smoothProgress,
-    [0, 1],
-    prefersReducedMotion ? [0, 0] : offsetY
-  );
-
-  return (
-    <motion.div ref={ref} style={{ y }} className={`will-change-transform ${className}`}>
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 };
 
 interface ParallaxMediaProps {
@@ -52,50 +26,28 @@ interface ParallaxMediaProps {
 }
 
 /**
- * Inner media image with subtle vertical counter-parallax inside an overflow-hidden frame.
+ * High-performance media image with explicit dimensions and zero forced-reflow scroll observers.
  */
 export const ParallaxImage: React.FC<ParallaxMediaProps> = ({
   src,
   alt,
   onError,
   className = '',
-  intensity = 18,
   priority = false,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const prefersReducedMotion = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    mass: 0.4,
-  });
-
-  const y = useTransform(
-    smoothProgress,
-    [0, 1],
-    prefersReducedMotion ? [0, 0] : [-intensity, intensity]
-  );
-
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden">
-      <motion.img
+    <div className="relative w-full h-full overflow-hidden">
+      <img
         src={src}
         alt={alt}
-        width={priority ? 960 : 720}
-        height={540}
+        width={priority ? 800 : 560}
+        height={priority ? 450 : 315}
         loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
+        decoding={priority ? 'sync' : 'async'}
         fetchPriority={priority ? 'high' : 'auto'}
         referrerPolicy="no-referrer"
         onError={onError}
-        style={{ y, scale: prefersReducedMotion ? 1 : 1.09 }}
-        className={`w-full h-full object-cover will-change-transform ${className}`}
+        className={`w-full h-full object-cover ${className}`}
       />
     </div>
   );

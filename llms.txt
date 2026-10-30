@@ -1,0 +1,99 @@
+# Solijon Solayev — Şaxsiy Vizitka va IT Portfolio / Shaxsiy Vizitka va IT Portfolio
+
+> Solijon Solayev (2003-yilda Xorazm viloyati, Yangiariq tumanida tuğilgan / tug'ilgan) — Frontend dasturçi (dasturchi), Solaris 3D (`solaris3d.uz`) va Tilimlo.uz (`tilimlo.uz`) veb-platformalari muallifi, GitHub oçiq manbali dasturlar (`usb-formatter`, `AqlliTozalash`, `kvadrat-tenglamalar`) yaratuvçisi, Özbekça Vikipediya (O'zbekcha Vikipediya) va Vikiombor (Wikimedia Commons) faoli hamda IT bloger (`@Solijon_Solayev`).
+
+Uşbu sayt ikki xil özbek lotin yozuvini töliq qöllab-quvvatlaydi:
+1. **Yangilangan Özbek Lotin Alifbosi (2026 — Ö, Ğ, Ş, Ç)**: `/?alphabet=new_2026`
+2. **Amaldagi O'zbek Lotin Alifbosi (Oʻ, Gʻ, Sh, Ch)**: `/?alphabet=classic`
+
+---
+
+## 1. Sayt Tuzilişi va Mustaqil Sahifalar / Site Architecture & Pages
+
+Saytda asosiy urg'u **«Men haqimda»** sahifasiga qaratilgan bo'lib, qolgan bo'limlar asosiy sahifada qisqacha prevyu ko'rinishida beriladi va ustiga bosilganda alohida to'liq sahifa sifatida ochiladi:
+- **`/#men-haqimda` (Asosiy sahifa / Home)**: Solijon Solayev haqida asosiy ma’lumotlar, ko'rsatkichlar, raqamli vizitka (`vCard .vcf` va QR-kod) hamda barcha bo'limlarning qisqa prevyusi.
+- **`/#loyihalar` (Loyihalar sahifasi / Projects)**: Mualliflik veb-platformalari (`Solaris 3D`, `Tilimlo.uz`) va GitHub ochiq kodli dasturlar katalogi.
+- **`/#blog` (Şaxsiy Blog sahifasi / Personal Blog)**: «Fikr qilamiz» va IT maqolalar, mavzular bo'yicha saralash, qidiruv, maqolani to'liq o'qish (`/#blog/:slug`) va AI yordamida ovozli tinglash (TTS).
+- **`/#tajriba` va `/#ekotizim` (Faoliyat, Könikmalar va Jonli Ekotizim / Experience & Live Ecosystem)**:
+  - Tajriba va ta’lim xronologiyasi, texnik ko'nikmalar matritsasi.
+  - **Jonli Oçiq Manba va Viki Ekotizim (`#ekotizim`)**: Real vaqtda GitHub repozitoriylari (`SolijonSolayev`), O'zbekcha Vikipediyadagi so'nggi tahrirlar (`Foydalanuvchi:Solijon_Solayev`) hamda **Vikiombor (Wikimedia Commons)** fondidagi Solijon Solayev mualliflik rasmlaridan tasodifiy tarzda avtomatik yangilanib turuvchi fotogalereya (`User:Solijon_Solayev`).
+- **`/#boglanish` (Boğlaniş sahifasi / Contact)**: Muloqot qoidasi, rasmiy aloqa kanallari va tezkor murojaat formasi.
+
+---
+
+## 2. Şaxsiy Ma’lumotlar / Shaxsiy Ma'lumotlar (Profile Overview)
+
+- **Ism-şarifi / Ism-sharifi**: Solijon Solayev
+- **Tuğilgan yili va joyi / Tug'ilgan yili va joyi**: 2003-yil, Xorazm viloyati, Yangiariq tumani, Özbekiston (O'zbekiston)
+- **Asosiy yönalişlari / Asosiy yo'nalishlari**:
+  - Frontend veb-dasturlaş (HTML5, CSS3, Tailwind CSS, JavaScript, TypeScript, React, 3D WebGL)
+  - Interaktiv 3D astronomiya va ilmiy veb-simulyatsiyalar (`solaris3d.uz`)
+  - Özbek tili imlosi va raqamli savodxonlik platformasi (`tilimlo.uz`)
+  - Kross-platforma foydali dasturlar va tizim skriptlari (Python, Shell, Linux, Windows, macOS)
+  - Özbekça Vikipediya (`uz.wikipedia.org`), Vikiombor (`commons.wikimedia.org`) va YouTube (`@Solijon_Solayev`)
+- **Elektron poçta / Elektron pochta**: `solijonsolayev2003@gmail.com`
+
+---
+
+## 3. Mualliflik Veb-Platformalari va GitHub Loyihalari (Projects)
+
+### A. Solaris 3D — Jonli Astronomiya va Kosmik Observatoriya
+- **URL**: https://solaris3d.uz
+- **GitHub**: https://github.com/SolijonSolayev/Solaris-3D-Jonli-Astronomiya-va-Kosmik-Observatoriya
+- **Tavsif (Yangi alifbo — Ö, Ğ, Ş, Ç)**: Osmon sirlari, quyoş tutilişi, yulduzlar, sayyoralar va boşqa kosmik hodisalarni real vaqt rejimida 3D vizualizatsiya hamda osmon sferasining interaktiv modellari orqali kuzatiş imkonini beruvçi platforma.
+- **Tavsif (Amaldagi alifbo — Oʻ, Gʻ, Sh, Ch)**: Osmon sirlari, quyosh tutilishi, yulduzlar, sayyoralar va boshqa kosmik hodisalarni real vaqt rejimida 3D vizualizatsiya hamda osmon sferasining interaktiv modellari orqali kuzatish imkonini beruvchi platforma.
+- **Texnologiyalar**: TypeScript, React, 3D WebGL, Tailwind CSS, Astronomiya Simulyatsiyasi.
+
+### B. Tilimlo.uz — Özbek Tili Imlosi va Matn Bilan İşlaş Platformasi
+- **URL**: https://tilimlo.uz
+- **Tavsif (Yangi alifbo — Ö, Ğ, Ş, Ç)**: Özbek tilida sözlarning töğri yozilişi (imlo qoidalari), matnlarni tahrirlaş va ona tilidagi raqamli savodxonlikni oşirişga qaratilgan ma’rifiy veb-loyiha.
+- **Tavsif (Amaldagi alifbo — Oʻ, Gʻ, Sh, Ch)**: O'zbek tilida so'zlarning to'g'ri yozilishi (imlo qoidalari), matnlarni tahrirlash va ona tilidagi raqamli savodxonlikni oshirishga qaratilgan ma'rifiy veb-loyiha.
+- **Texnologiyalar**: TypeScript, React, Tailwind CSS, Özbek Tili va Imlo Qoidalari.
+
+### C. usb-formatter — Universal USB Formatlaş Vositasi
+- **URL**: https://github.com/SolijonSolayev/usb-formatter
+- **Tavsif**: Linux, Windows va macOS operatsion tizimlarida işlaşga möljallangan, USB xotira qurilmalarini qulay va xavfsiz formatlaş imkonini beruvçi ochiq kodli Python dasturi.
+
+### D. AqlliTozalash — Tizim Keşini va Vaqtinçalik Fayllarni Tozalaş
+- **URL**: https://github.com/SolijonSolayev/AqlliTozalash
+- **Tavsif**: macOS, Linux va Windows tizimlarida yiğilib qolgan keş (cache) hamda vaqtinçalik fayllarni xavfsiz tozalaş orqali kompyuter işlaşini yengillaştiruvçi skriptlar töplami.
+
+### E. kvadrat-tenglamalar — Qadam-baqadam Kvadrat Tenglama Yeçiş Vositasi
+- **URL**: https://github.com/SolijonSolayev/kvadrat-tenglamalar
+- **Tavsif**: Matematik kvadrat tenglamalarni avtomatik yeçuvçi va har bir yeçim qadamini (diskriminant va ildizlar) batafsil tuşuntirib körsatuvçi interaktiv veb-sahifa.
+
+### F. Delote-Beauty, sayohat-uz va solijonsolayev.github.io
+- **URL**: https://solijonsolayev.github.io/
+- **Tavsif**: Semantik HTML5, CSS3, Tailwind CSS va React yordamida yaratilgan zamonaviy frontend veb-sahifalar va şaxsiy GitHub Pages portfeli.
+
+---
+
+## 4. Şaxsiy Blog («Fikr qilamiz» va IT Maqolalar)
+
+- **Blog manzili**: `/#blog` (RSS oqimi: `/rss.xml`)
+- **Asosiy maqolalar**:
+  1. *Solaris 3D (solaris3d.uz): Veb-brauzerda real vaqt rejimida 3D astronomiya va kosmik observatoriya yaratish tajribasi* (`/#blog/solaris-3d-jonli-astronomiya-observatoriya`)
+  2. *Tilimlo.uz va yangilangan o'zbek lotin alifbosi: Raqamli savodxonlikda yangi bosqich* (`/#blog/tilimlo-uz-va-yangilangan-ozbek-alifbosi`)
+  3. *Linux, Windows va macOS uchun ochiq kodli tizim vositalari: usb-formatter va AqlliTozalash* (`/#blog/linux-windows-macos-uchun-ochiq-kodli-vositalar`)
+  4. *Fikr qilamiz: O'zbekcha Vikipediya, Vikiombor va erkin bilimlar ekotizimiga hissa qo'shish nima uchun muhim?* (`/#blog/ozbekcha-vikipediya-vikiombor-va-erkin-bilim`)
+
+---
+
+## 5. Rasmiy Havolalar / Official Profiles
+
+- **Rasmiy Domen / Official Website**: https://solijonsolayev.uz/
+- **Solaris 3D**: https://solaris3d.uz
+- **Tilimlo.uz**: https://tilimlo.uz
+- **Taplink (Barcha havolalar)**: https://taplink.cc/solijon_solayev
+- **GitHub Profil**: https://github.com/SolijonSolayev
+- **GitHub Pages Portfolio**: https://solijonsolayev.github.io/
+- **YouTube Kanal**: https://www.youtube.com/@Solijon_Solayev
+- **Özbekça Vikipediya / O'zbekcha Vikipediya**: https://uz.wikipedia.org/wiki/Foydalanuvchi:Solijon_Solayev
+- **Vikiombor / Wikimedia Commons (Mualliflik rasmlari)**: https://commons.wikimedia.org/wiki/User:Solijon_Solayev
+
+---
+
+## 6. Muloqot Qoidasi / Communication Etiquette
+
+Murojaat qilganda vaqtni qadrlașingiz soraladi: faqat «Salom» yoki «Alo» deb javob kutmasdan, savol yoki taklifingizni bitta aniq va tuşunarli xabarda töliq yozib qoldiring.
+Bog'lanish uchun: `solijonsolayev2003@gmail.com`, `/#boglanish` yoki `https://taplink.cc/solijon_solayev`.

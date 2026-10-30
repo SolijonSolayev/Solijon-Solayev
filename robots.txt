@@ -1,0 +1,47 @@
+# robots.txt — Solijon Solayev (https://solijonsolayev.uz)
+# Shaxsiy Vizitka, IT Portfolio, Blog va Jonli Ekotizim
+# Supports Google, Yandex, Bing, DuckDuckGo, and AI Search Engines (llms.txt, rss.xml, sitemap.xml)
+
+User-agent: *
+Allow: /
+Allow: /.well-known/pki-validation/
+Allow: /sitemap.xml
+Allow: /rss.xml
+Allow: /llms.txt
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Allow: /.well-known/pki-validation/
+Disallow: /api/
+
+User-agent: Yandex
+Allow: /
+Allow: /.well-known/pki-validation/
+Disallow: /api/
+Clean-param: ref&utm_source&utm_medium&utm_campaign /
+
+User-agent: YandexBot
+Allow: /
+Allow: /.well-known/pki-validation/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Allow: /.well-known/pki-validation/
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Host: https://solijonsolayev.uz
+Sitemap: https://solijonsolayev.uz/sitemap.xml

@@ -709,12 +709,70 @@ Maqola tarkibida:
     }
   });
 
-  // Serve SSL Domain Control Validation (DCV) file directly in both dev and prod
+  const publicDirPath = path.join(__dirname, 'public');
+
+  const serveStaticFile = (
+    res: express.Response,
+    relativeFilePath: string,
+    contentType: string,
+    fallbackText?: string
+  ) => {
+    const publicFile = path.join(publicDirPath, relativeFilePath);
+    const rootFile = path.join(__dirname, relativeFilePath);
+    const distFile = path.join(__dirname, 'dist', relativeFilePath);
+
+    const resolvedFile = [publicFile, distFile, rootFile].find((candidate) =>
+      fs.existsSync(candidate)
+    );
+
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    if (resolvedFile) {
+      res.type(contentType).send(fs.readFileSync(resolvedFile, 'utf-8'));
+      return;
+    }
+    if (fallbackText !== undefined) {
+      res.type(contentType).send(fallbackText);
+      return;
+    }
+    res.status(404).type('text/plain; charset=utf-8').send('Not Found');
+  };
+
+  // Serve SSL Domain Control Validation (DCV) & SEO files directly in both dev and prod
   app.get('/.well-known/pki-validation/certum.txt', (_req, res) => {
-    res
-      .type('text/plain; charset=utf-8')
-      .send('105576dbc17fae66a68874553ed5a48a74212981fc2907467b6e77f6aa69c9e-certum.pl');
+    serveStaticFile(
+      res,
+      '.well-known/pki-validation/certum.txt',
+      'text/plain; charset=utf-8',
+      '105576dbc17fae66a68874553ed5a48a74212981fc2907467b6e77f6aa69c9e-certum.pl'
+    );
   });
+
+  app.get('/sitemap.xml', (_req, res) => {
+    serveStaticFile(res, 'sitemap.xml', 'application/xml; charset=utf-8');
+  });
+
+  app.get('/robots.txt', (_req, res) => {
+    serveStaticFile(res, 'robots.txt', 'text/plain; charset=utf-8');
+  });
+
+  app.get('/llms.txt', (_req, res) => {
+    serveStaticFile(res, 'llms.txt', 'text/plain; charset=utf-8');
+  });
+
+  app.get('/rss.xml', (_req, res) => {
+    serveStaticFile(res, 'rss.xml', 'application/rss+xml; charset=utf-8');
+  });
+
+  app.get('/CNAME', (_req, res) => {
+    serveStaticFile(res, 'CNAME', 'text/plain; charset=utf-8', 'solijonsolayev.uz\n');
+  });
+
+  app.get(['/.well-known/security.txt', '/security.txt'], (_req, res) => {
+    serveStaticFile(res, '.well-known/security.txt', 'text/plain; charset=utf-8');
+  });
+
+  // Always serve /public static files directly (with dotfiles enabled) before SPA fallback
+  app.use(express.static(publicDirPath, { dotfiles: 'allow', index: false }));
 
   const buildCanonicalPreviewUrl = (req: express.Request): string => {
     const base = 'https://solijonsolayev.uz/';

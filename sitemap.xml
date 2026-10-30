@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+  <!-- 1. Main Portfolio Page (Default: 2026 Reformed Uzbek Latin Alphabet Ö, Ğ, Ş, Ç) -->
+  <url>
+    <loc>https://solijonsolayev.uz/</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="en"
+      href="https://solijonsolayev.uz/?lang=en"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://solijonsolayev.uz/"
+    />
+  </url>
+
+  <!-- 2. Reformed 2026 Uzbek Alphabet Version (Ö, Ğ, Ş, Ç) -->
+  <url>
+    <loc>https://solijonsolayev.uz/?alphabet=new_2026</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="en"
+      href="https://solijonsolayev.uz/?lang=en"
+    />
+  </url>
+
+  <!-- 3. Classic Uzbek Latin Alphabet Version (Oʻ, Gʻ, Sh, Ch) -->
+  <url>
+    <loc>https://solijonsolayev.uz/?alphabet=classic</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="en"
+      href="https://solijonsolayev.uz/?lang=en"
+    />
+  </url>
+
+  <!-- 4. English Language Version -->
+  <url>
+    <loc>https://solijonsolayev.uz/?lang=en</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="en"
+      href="https://solijonsolayev.uz/?lang=en"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic"
+    />
+  </url>
+
+  <!-- 5. Dedicated Indexable Sub-Pages (Query & Hash URLs for Search Engine Crawlers) -->
+  <url>
+    <loc>https://solijonsolayev.uz/?page=loyihalar</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?page=blog</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?page=tajriba</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?page=boglanish</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- 6. Featured Blog Articles with Dual-Alphabet Alternates -->
+  <url>
+    <loc>https://solijonsolayev.uz/?article=solaris-3d-jonli-astronomiya-observatoriya</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026&amp;article=solaris-3d-jonli-astronomiya-observatoriya"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic&amp;article=solaris-3d-jonli-astronomiya-observatoriya"
+    />
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?article=tilimlo-uz-va-yangilangan-ozbek-alifbosi</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026&amp;article=tilimlo-uz-va-yangilangan-ozbek-alifbosi"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic&amp;article=tilimlo-uz-va-yangilangan-ozbek-alifbosi"
+    />
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?article=linux-windows-macos-uchun-ochiq-kodli-vositalar</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026&amp;article=linux-windows-macos-uchun-ochiq-kodli-vositalar"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic&amp;article=linux-windows-macos-uchun-ochiq-kodli-vositalar"
+    />
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/?article=ozbekcha-vikipediya-vikiombor-va-erkin-bilim</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz-Latn"
+      href="https://solijonsolayev.uz/?alphabet=new_2026&amp;article=ozbekcha-vikipediya-vikiombor-va-erkin-bilim"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="uz"
+      href="https://solijonsolayev.uz/?alphabet=classic&amp;article=ozbekcha-vikipediya-vikiombor-va-erkin-bilim"
+    />
+  </url>
+
+  <!-- 7. RSS 2.0 Feed & AI/LLM Structured Knowledge Index -->
+  <url>
+    <loc>https://solijonsolayev.uz/rss.xml</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://solijonsolayev.uz/llms.txt</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+</urlset>

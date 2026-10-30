@@ -14,7 +14,17 @@ export default defineConfig(() => {
         devOptions: {
           enabled: true,
         },
-        includeAssets: ['icon.svg', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
+        includeAssets: [
+          'icon.svg',
+          'apple-touch-icon.png',
+          'pwa-192x192.png',
+          'pwa-512x512.png',
+          'sitemap.xml',
+          'robots.txt',
+          'llms.txt',
+          'rss.xml',
+          'CNAME',
+        ],
         manifest: {
           id: '/',
           name: 'Solijon Solayev — IT Portfolio & Vizitka',
@@ -50,6 +60,16 @@ export default defineConfig(() => {
         workbox: {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
+          navigateFallbackDenylist: [
+            /^\/sitemap\.xml$/i,
+            /^\/robots\.txt$/i,
+            /^\/llms\.txt$/i,
+            /^\/rss\.xml$/i,
+            /^\/CNAME$/i,
+            /^\/security\.txt$/i,
+            /^\/\.well-known\/.*/i,
+            /^\/api\/.*/i,
+          ],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

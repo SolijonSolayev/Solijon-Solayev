@@ -1,0 +1,4 @@
+Contact: mailto:solijonsolayev2003@gmail.com
+Canonical: https://solijonsolayev.uz/.well-known/security.txt
+Preferred-Languages: uz, en
+Expires: 2028-12-31T23:59:59.000Z

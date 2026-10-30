@@ -27,6 +27,7 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 import { DEFAULT_PROFILE_DATA } from '../data/defaultProfile';
 import { ProfileData } from '../types/profile';
+import { getCanonicalRepoKey } from '../utils/githubHelpers';
 import { resolveAssetUrl } from '../utils/assetUrl';
 
 export const ADMIN_EMAIL = 'solijonsolayev2003@gmail.com';
@@ -243,25 +244,34 @@ export function subscribeToPortfolio(
           ? (() => {
               const defaultProjList = DEFAULT_PROFILE_DATA.projects;
               const fsProjList = data.projects as ProfileData['projects'];
-              const fsMap = new Map(fsProjList.map((p) => [p.id, p]));
               const merged: ProfileData['projects'] = [];
-              const processed = new Set<string>();
+              const processedKeys = new Set<string>();
+
+              const fsMap = new Map<string, ProfileData['projects'][number]>();
+              for (const fsP of fsProjList) {
+                const key = getCanonicalRepoKey(fsP);
+                if (key) fsMap.set(key, fsP);
+              }
 
               for (const defProj of defaultProjList) {
-                processed.add(defProj.id);
-                const fsProj = fsMap.get(defProj.id);
-                if (fsProj) {
+                const key = getCanonicalRepoKey(defProj);
+                if (key) processedKeys.add(key);
+                const fsMatch = fsMap.get(key);
+                if (fsMatch) {
                   merged.push({
                     ...defProj,
-                    ...fsProj,
-                    imageUrl: resolveAssetUrl(fsProj.imageUrl, defProj.imageUrl),
+                    ...fsMatch,
+                    imageUrl: resolveAssetUrl(fsMatch.imageUrl, defProj.imageUrl),
                   });
                 } else {
                   merged.push(defProj);
                 }
               }
+
               for (const fsProj of fsProjList) {
-                if (!processed.has(fsProj.id)) {
+                const key = getCanonicalRepoKey(fsProj);
+                if (key && !processedKeys.has(key)) {
+                  processedKeys.add(key);
                   merged.push({
                     ...fsProj,
                     imageUrl: resolveAssetUrl(fsProj.imageUrl, ''),

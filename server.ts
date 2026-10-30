@@ -212,9 +212,9 @@ async function fetchExternalLiveActivity() {
 
   const [ghUserRes, ghReposRes, wikiRes, commonsRes] = await Promise.allSettled([
     fetch('https://api.github.com/users/SolijonSolayev', { headers }),
-    fetch('https://api.github.com/users/SolijonSolayev/repos?sort=updated&per_page=8', { headers }),
+    fetch('https://api.github.com/users/SolijonSolayev/repos?sort=updated&per_page=100', { headers }),
     fetch(
-      'https://uz.wikipedia.org/w/api.php?action=query&list=users|usercontribs&ususers=Solijon_Solayev&usprop=editcount|registration&ucuser=Solijon_Solayev&uclimit=6&ucprop=title|timestamp|comment|sizediff&format=json',
+      'https://uz.wikipedia.org/w/api.php?action=query&list=users|usercontribs&ususers=Solijon_Solayev&usprop=editcount|registration&ucuser=Solijon_Solayev&uclimit=12&ucprop=title|timestamp|comment|sizediff&format=json',
       { headers }
     ),
     fetch(
@@ -233,8 +233,6 @@ async function fetchExternalLiveActivity() {
     const rawRepos = await ghReposRes.value.json();
     if (Array.isArray(rawRepos)) {
       githubRepos = rawRepos
-        .filter((r) => !r.fork)
-        .slice(0, 6)
         .map((r, idx) => ({
           id: r.id ?? idx + 1,
           name: r.name || `repo-${idx + 1}`,
@@ -710,6 +708,13 @@ Maqola tarkibida:
     }
   });
 
+  // Serve SSL Domain Control Validation (DCV) file directly in both dev and prod
+  app.get('/.well-known/pki-validation/certum.txt', (_req, res) => {
+    res
+      .type('text/plain; charset=utf-8')
+      .send('105576dbc17fae66a68874553ed5a48a74212981fc2907467b6e77f6aa69c9e-certum.pl');
+  });
+
   const server = http.createServer(app);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -725,7 +730,7 @@ Maqola tarkibida:
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(__dirname, 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { dotfiles: 'allow' }));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });

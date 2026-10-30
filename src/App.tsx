@@ -92,6 +92,7 @@ import {
 import { soundEffects } from './utils/soundEffects';
 import { useHapticFeedback } from './hooks/useHapticFeedback';
 import { downloadVCard } from './utils/vcard';
+import { getCanonicalRepoKey } from './utils/githubHelpers';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
 export type ThemeMode = 'dark' | 'light';
@@ -417,6 +418,152 @@ export default function App() {
       window.removeEventListener('hashchange', handleUrlStateChange);
       window.removeEventListener('popstate', handleUrlStateChange);
       window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Fetch all public GitHub repositories for SolijonSolayev in real-time, update existing items with live metrics, and append new ones with 0 duplicates
+  useEffect(() => {
+    let isMounted = true;
+    async function syncGithubProjects() {
+      try {
+        const res = await fetch(
+          'https://api.github.com/users/SolijonSolayev/repos?sort=updated&per_page=100'
+        );
+        if (!res.ok) return;
+        const repos = await res.json();
+        if (!Array.isArray(repos) || !isMounted) return;
+
+        setRawProfile((prev) => {
+          const existingProjects = prev.projects || [];
+          const projectKeyMap = new Map<string, ProjectItem>();
+          const projectOrder: string[] = [];
+
+          for (const p of existingProjects) {
+            const key = getCanonicalRepoKey(p);
+            if (key) {
+              projectKeyMap.set(key, p);
+              projectOrder.push(key);
+            }
+          }
+
+          for (const repo of repos) {
+            if (!repo || !repo.name) continue;
+            const repoName = repo.name.trim();
+            const repoKey = getCanonicalRepoKey({
+              name: repoName,
+              html_url: repo.html_url,
+              liveUrl: repo.homepage,
+            });
+
+            if (!repoKey) continue;
+
+            const repoUrl =
+              repo.html_url || `https://github.com/SolijonSolayev/${repoName}`;
+            const liveUrl =
+              repo.homepage && repo.homepage.trim().length > 0
+                ? repo.homepage
+                : repoUrl;
+            const year = repo.updated_at
+              ? new Date(repo.updated_at).getFullYear().toString()
+              : '2026';
+
+            let category: ProjectCategory = 'Foydali dasturlar';
+            const lowerName = repoName.toLowerCase();
+            if (
+              lowerName.includes('solaris') ||
+              lowerName.includes('tilimlo') ||
+              lowerName.includes('site') ||
+              lowerName.includes('web') ||
+              lowerName.includes('portfolio') ||
+              lowerName.includes('beauty') ||
+              lowerName.includes('sayohat') ||
+              lowerName.includes('.io') ||
+              repo.language === 'TypeScript' ||
+              repo.language === 'JavaScript' ||
+              repo.language === 'HTML' ||
+              repo.language === 'CSS'
+            ) {
+              category = 'Veb-loyihalar';
+            } else if (lowerName.includes('wiki') || lowerName.includes('commons')) {
+              category = 'Ochiq bilim va Media';
+            }
+
+            let imageUrl = '/src/assets/images/project_ai_analytics_1793267851074.jpg';
+            if (lowerName.includes('solaris')) {
+              imageUrl = '/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg';
+            } else if (lowerName.includes('tilimlo')) {
+              imageUrl = '/src/assets/images/project_tilimlo_platform_1793272827504.jpg';
+            } else if (lowerName.includes('formatter') || lowerName.includes('usb')) {
+              imageUrl = '/src/assets/images/project_fintech_platform_1793267850542.jpg';
+            } else if (lowerName.includes('tozalash') || lowerName.includes('clean')) {
+              imageUrl = '/src/assets/images/project_mobile_banking_1793267852640.jpg';
+            } else if (
+              lowerName.includes('kvadrat') ||
+              lowerName.includes('math') ||
+              lowerName.includes('beauty') ||
+              lowerName.includes('sayohat')
+            ) {
+              imageUrl = '/src/assets/images/project_ecommerce_engine_1793267852059.jpg';
+            }
+
+            const existingP = projectKeyMap.get(repoKey);
+            if (existingP) {
+              // Update existing item with live stars, language, and repoUrl without duplicating
+              projectKeyMap.set(repoKey, {
+                ...existingP,
+                year: year || existingP.year,
+                impactMetric: `GitHub Repozitoriya · ${
+                  repo.language || existingP.technologies[0] || 'Code'
+                } · ★ ${repo.stargazers_count || 0}`,
+                repoUrl: repoUrl || existingP.repoUrl,
+                liveUrl: liveUrl || existingP.liveUrl,
+              });
+            } else {
+              // Brand new repo: add to map and order
+              projectKeyMap.set(repoKey, {
+                id: `gh_${repo.id || repoName}`,
+                title: repo.description ? `${repoName} — ${repo.description}` : repoName,
+                category,
+                year,
+                client: 'Ochiq manbali loyiha (GitHub)',
+                role: 'Muallif va dasturchi',
+                featured: false,
+                summary: repo.description || `GitHub repozitoriyasi: ${repoName}`,
+                challenge: `Ochiq manbali dasturiy ta'minot yaratish va ${
+                  repo.language || 'kod'
+                } bazasini rivojlantirish.`,
+                solution: `GitHub platformasida erkin kodi taqdim etilgan ${repoName} ishlanmasi.`,
+                impactMetric: `GitHub Repozitoriya · ${
+                  repo.language || 'Code'
+                } · ★ ${repo.stargazers_count || 0}`,
+                technologies: [repo.language || 'Code', 'GitHub', 'Open Source'].filter(
+                  Boolean
+                ),
+                imageUrl,
+                liveUrl,
+                repoUrl,
+              });
+              projectOrder.push(repoKey);
+            }
+          }
+
+          const nextProjects = projectOrder
+            .map((k) => projectKeyMap.get(k))
+            .filter((p): p is ProjectItem => Boolean(p));
+
+          return {
+            ...prev,
+            projects: nextProjects,
+          };
+        });
+      } catch {
+        // ignore github fetch errors
+      }
+    }
+
+    syncGithubProjects();
+    return () => {
+      isMounted = false;
     };
   }, []);
 
@@ -1610,8 +1757,8 @@ export default function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {profile.projects.slice(0, 2).map((project) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {profile.projects.slice(0, 6).map((project) => (
                 <Card10
                   key={project.id}
                   title={project.title}

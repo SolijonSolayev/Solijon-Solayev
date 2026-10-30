@@ -165,7 +165,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
       technologies: ['TypeScript', 'React', 'Tailwind CSS', 'O\'zbek Tili & Imlo'],
       imageUrl: resolveAssetUrl('/src/assets/images/project_tilimlo_platform_1793272827504.jpg'),
       liveUrl: 'https://tilimlo.uz',
-      repoUrl: 'https://github.com/SolijonSolayev',
+      repoUrl: 'https://github.com/SolijonSolayev/Tilimlo.uz',
     },
     {
       id: 'p1',
@@ -228,24 +228,304 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
       repoUrl: 'https://github.com/SolijonSolayev/kvadrat-tenglamalar',
     },
     {
-      id: 'p4',
-      title: 'Delote-Beauty, sayohat-uz va solijonsolayev.github.io',
+      id: 'p_solijonsolayev_io',
+      title: 'SolijonSolayev.github.io — Shaxsiy IT Portfolio & Blog',
+      category: 'Veb-loyihalar',
+      year: '2026',
+      client: 'Shaxsiy veb-sahifa (GitHub Pages)',
+      role: 'Asoschi va dasturchi',
+      featured: true,
+      summary:
+        'TypeScript, React, Tailwind CSS hamda AI Studio imkoniyatlari asosida yaratilgan zamonaviy shaxsiy vizitka, IT portfolio va blog platformasi.',
+      challenge:
+        'Frontend dasturchi portfoliosini barcha qurilmalarda tez ishlaydigan, 2026-yilgi yangilangan lotin alifbosini va PWA oflayn rejimni qo\'llaydigan mukammal holatga keltirish.',
+      solution:
+        'Ultra-tezkor SPA arxitekturasi, live GitHub/Wikimedia integratsiyasi va interaktiv 3D simulyatsiyalar bilan ta\'minlangan portfolio platformasi ishlab chiqildi.',
+      impactMetric: 'solijonsolayev.github.io · Shaxsiy Veb-Portfolio',
+      technologies: ['TypeScript', 'React', 'Tailwind CSS', 'PWA', 'GitHub Pages'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ecommerce_engine_1793267852059.jpg'),
+      liveUrl: 'https://solijonsolayev.github.io/',
+      repoUrl: 'https://github.com/SolijonSolayev/SolijonSolayev.github.io',
+    },
+    {
+      id: 'p_delote_beauty',
+      title: 'Delote-Beauty — Go\'zallik Saloni Veb-Interfeysi',
       category: 'Veb-loyihalar',
       year: '2024',
-      client: 'Amaliy Frontend Portfolio',
+      client: 'Frontend loyiha',
       role: 'Frontend dasturchi',
       featured: false,
       summary:
-        'Zamonaviy veb-dizayn tamoyillari asosida qayta ishlangan Delote-Beauty saloni sahifasi, sayohat-uz loyihasi hamda GitHub Pages shaxsiy veb-sahifasi.',
+        'Zamonaviy estetika va premium veb-dizayn tamoyillari asosida yaratilgan go\'zallik saloni landing page sahifasi.',
       challenge:
-        'Turli mavzudagi maketlarni semantik HTML, zamonaviy CSS/Tailwind va React komponentlari yordamida sifatli va moslashuvchan holatga keltirish.',
+        'Interaktiv xizmatlar menyusi va xodimlarni band qilish interfeysini qulay hamda moslashuvchan shaklda yaratish.',
       solution:
-        'Toza tipografiya, tartibli grid tizimi va mobil qurilmalarga moslashuvchan sahifalar yaratilib, GitHub\'ga joylashtirildi.',
-      impactMetric: 'Toza veb-maketlar va amaliy frontend tajriba',
-      technologies: ['HTML5', 'CSS3', 'Tailwind CSS', 'React', 'GitHub Pages'],
+        'Semantik HTML5, zamonaviy CSS Grid va React komponentlari yordamida nafis veb-interfeys tuzildi.',
+      impactMetric: 'Nafis UI/UX dizayn va toza veb-maket',
+      technologies: ['HTML5', 'CSS3', 'Tailwind CSS', 'React'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_mobile_banking_1793267852640.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/Delote-Beauty',
+      repoUrl: 'https://github.com/SolijonSolayev/Delote-Beauty',
+    },
+    {
+      id: 'p_sayohat_uz',
+      title: 'sayohat-uz — Milliy Turizm va Sayohat Portal Vositasi',
+      category: 'Veb-loyihalar',
+      year: '2024',
+      client: 'Frontend loyiha',
+      role: 'Frontend dasturchi',
+      featured: false,
+      summary:
+        'O\'zbekistonning tarixiy shaharlari va turizm ob\'yektlarini namoyish etuvchi interaktiv sayohat sahifasi.',
+      challenge:
+        'Sayohat yo\'nalishlari, fotosuratlar va ma\'lumotlarni mobil ekranlarda tez va qulay ko\'rish imkonini berish.',
+      solution:
+        'Yuqori sifatli fotosuratlar, qidiruv va kartochkalar tizimidan iborat zamonaviy turizm sahifasi tuzildi.',
+      impactMetric: 'Turizm va O\'zbekiston sayohat yo\'nalishlari',
+      technologies: ['HTML5', 'CSS3', 'JavaScript', 'React'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_fintech_platform_1793267850542.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/sayohat-uz',
+      repoUrl: 'https://github.com/SolijonSolayev/sayohat-uz',
+    },
+    {
+      id: 'p_wiki_articles',
+      title: 'O\'zbekcha Vikipediya Maqolalar Portali',
+      category: 'Ochiq bilim va Media',
+      year: '2026',
+      client: 'O\'zbekcha Vikipediya & Wikimedia',
+      role: 'Ensiklopedist muallif',
+      featured: false,
+      summary:
+        'O\'zbekcha Vikipediyada geografiya, tarix, axborot texnologiyalari va madaniy meros yo\'nalishlarida 420 dan ortiq sifatli tahrirlar va boyitilgan maqolalar.',
+      challenge:
+        'Erkin ensiklopediyada o\'zbek tilida manbalar bilan tasdiqlangan, ilmiy va ishonchli maqolalar ulushini oshirish.',
+      solution:
+        'Wikimedia MediaWiki qoidalariga mos holda xalqaro ensiklopedik standartlardagi tahrirlar amalga oshirildi.',
+      impactMetric: 'uz.wikipedia.org · 420+ Ensiklopedik tahrir',
+      technologies: ['uz.wikipedia.org', 'MediaWiki', 'Ochiq Bilim', 'Manbalar Tahlili'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg'),
+      liveUrl: 'https://uz.wikipedia.org/wiki/Foydalanuvchi:Solijon_Solayev',
+      repoUrl: 'https://uz.wikipedia.org/wiki/Foydalanuvchi:Solijon_Solayev',
+    },
+    {
+      id: 'p_commons_gallery',
+      title: 'Wikimedia Commons Mualliflik Fotogalereyasi',
+      category: 'Ochiq bilim va Media',
+      year: '2026',
+      client: 'Wikimedia Commons',
+      role: 'Muallif va fotograf',
+      featured: false,
+      summary:
+        'Wikimedia Commons xalqaro media bazasiga erkin CC BY-SA 4.0 litsenziyasi ostida yuklangan sifatli mualliflik fotosuratlari to\'plami.',
+      challenge:
+        'O\'zbekiston hududlari, tabiat ob\'yektlari va me\'moriy obidalarning erkin foydalaniladigan sifatli fotosuratlarini yaratish.',
+      solution:
+        'Xalqaro Vikiombor platformasiga yuqori aniqlikdagi mualliflik fotosuratlari muntazam ravishda joylashtirildi.',
+      impactMetric: 'Wikimedia Commons · Erkin Media Fotosuratlar',
+      technologies: ['Wikimedia Commons', 'Fotografiya', 'CC BY-SA 4.0'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_tilimlo_platform_1793272827504.jpg'),
+      liveUrl: 'https://commons.wikimedia.org/wiki/User:Solijon_Solayev',
+      repoUrl: 'https://commons.wikimedia.org/wiki/User:Solijon_Solayev',
+    },
+    {
+      id: 'p_python_darsliklar',
+      title: 'python-darsliklar — Amaliy Python Dasturlash Qo\'llanmalari',
+      category: 'Foydali dasturlar',
+      year: '2025',
+      client: 'Ochiq manbali o\'quv loyiha',
+      role: 'Muallif va dasturchi',
+      featured: false,
+      summary:
+        'Boshlang\'ich va o\'rta darajadagi dasturchilar uchun Python dasturlash tili sintaksisi, algoritmlar va amaliy mashqlar to\'plami.',
+      challenge:
+        'Python dasturlash tili asoslarini o\'zbek tilida sodda, tushunarli va amaliy misollar orqali tushuntirish.',
+      solution:
+        'Interaktiv kod parchalari, algoritmlar va real mashqlardan iborat ochiq manbali repozitoriya yaratildi.',
+      impactMetric: 'Python 3 · Algoritmlar va O\'quv Darsliklar',
+      technologies: ['Python', 'Open Source', 'Ta\'lim'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ai_analytics_1793267851074.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/python-darsliklar',
+      repoUrl: 'https://github.com/SolijonSolayev/python-darsliklar',
+    },
+    {
+      id: 'p_fikr_qilamiz_blog',
+      title: '«Fikr qilamiz» Telegram Blogi & Raqamli Kontent',
+      category: 'Ochiq bilim va Media',
+      year: '2026',
+      client: 'Shaxsiy media loyiha',
+      role: 'Bloger va muallif',
+      featured: false,
+      summary:
+        'Telegramdagi «Fikr qilamiz» blogida IT texnologiyalar, kiberxavfsizlik, raqamli savodxonlik va shaxsiy rivojlanish bo\'yicha tahliliy postlar.',
+      challenge:
+        'Dasturlash va raqamli texnologiyalar sohasidagi yangiliklarni o\'zbek tilida muntazam va sifatli yoritib borish.',
+      solution:
+        'Foydali tavsiyalar, dasturlar sharhi va falsafiy mulohazalar bilan boyitilgan samimiy blog yuritilmoqda.',
+      impactMetric: 'Telegram Blog · IT va Raqamli Savodxonlik',
+      technologies: ['Telegram', 'Blog', 'Raqamli Savodxonlik'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_fintech_platform_1793267850542.jpg'),
+      liveUrl: 'https://taplink.cc/solijon_solayev',
+      repoUrl: 'https://taplink.cc/solijon_solayev',
+    },
+    {
+      id: 'p_solaris_optics',
+      title: 'Solaris-3D-Optics — Teleskop va Optika Simulyatori',
+      category: 'Veb-loyihalar',
+      year: '2026',
+      client: 'Solaris 3D sub-loyiha',
+      role: 'Dasturchi',
+      featured: false,
+      summary:
+        'Optik teleskoplar, linzalar va burchak kattalashtirish fizikasi bo\'yicha interaktiv 3D vizualizatsiya va optik simulyatsiya vositasi.',
+      challenge:
+        'Teleskopik kuzatuvlarda ob\'yektiv va okulardan o\'tadigan nur sindirish mexanizmini brauzerda simulyatsiya qilish.',
+      solution:
+        'Optik formulalar va WebGL grafikasi yordamida interaktiv optika laboratoriyasi ishlab chiqildi.',
+      impactMetric: 'Interactive Optics · 3D WebGL Simulyatsiya',
+      technologies: ['TypeScript', '3D WebGL', 'Optika Fizikasi', 'React'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg'),
+      liveUrl: 'https://solaris3d.uz',
+      repoUrl: 'https://github.com/SolijonSolayev/Solaris-3D-Optics',
+    },
+    {
+      id: 'p_tilimlo_bot',
+      title: 'tilimlo-bot — Imlo Tekshiruvchi Telegram Boti',
+      category: 'Foydali dasturlar',
+      year: '2026',
+      client: 'Tilimlo.uz ekotizimi',
+      role: 'Backend & Bot dasturchi',
+      featured: false,
+      summary:
+        'Foydalanuvchilar tomonidan yuborilgan so\'z va matnlarni tezkor imlo tekshiruvidan o\'tkazuvchi va to\'g\'ri muqobilini beruvchi bot.',
+      challenge:
+        'Telegram messenjerining o\'zida foydalanuvchilar uchun imlo xatolarini bir necha millisoniyada topib beruvchi interfeys yaratish.',
+      solution:
+        'Python va Tilimlo lug\'at bazasi integratsiyasi orqali tezkor va qulay Telegram bot ishga tushirildi.',
+      impactMetric: 'Telegram Bot · O\'zbek tili imlosi',
+      technologies: ['Python', 'Telegram API', 'NLP / Text Analysis'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_tilimlo_platform_1793272827504.jpg'),
+      liveUrl: 'https://tilimlo.uz',
+      repoUrl: 'https://github.com/SolijonSolayev/tilimlo-bot',
+    },
+    {
+      id: 'p_uzbek_converter',
+      title: 'uzbek-alphabet-converter — 2026 Alifbo Transliteratori',
+      category: 'Foydali dasturlar',
+      year: '2026',
+      client: 'Ochiq manbali utilita',
+      role: 'Muallif va dasturchi',
+      featured: false,
+      summary:
+        'Amaldagi o\'zbek lotin alifbosi va 2026-yilgi yangilangan lotin alifbosi (Ö, Ğ, Ş, Ç) o\'rtasida matnlarni xatosiz transliteratsiya qilish kutubxonasi.',
+      challenge:
+        'Dasturchilar va matn muharrirlari uchun alifbo islohotiga mos ravishda avtomatik o\'giruvchi algoritm yaratish.',
+      solution:
+        'Texnik istisnolar (Protected Tech Words) va tutuq belgilarini saqlagan holda ishlaydigan kross-platforma konvertor yaratildi.',
+      impactMetric: 'Transliteratsiya · 2026 Yangilangan Alifbo',
+      technologies: ['TypeScript', 'JavaScript', 'Regular Expressions'],
       imageUrl: resolveAssetUrl('/src/assets/images/project_ecommerce_engine_1793267852059.jpg'),
-      liveUrl: 'https://solijonsolayev.github.io/',
-      repoUrl: 'https://github.com/SolijonSolayev',
+      liveUrl: 'https://github.com/SolijonSolayev/uzbek-alphabet-converter',
+      repoUrl: 'https://github.com/SolijonSolayev/uzbek-alphabet-converter',
+    },
+    {
+      id: 'p_weather_uz',
+      title: 'weather-forecast-uz — O\'zbekiston Hududlari Ob-Havo Vositasi',
+      category: 'Veb-loyihalar',
+      year: '2025',
+      client: 'Amaliy veb-loyiha',
+      role: 'Frontend dasturchi',
+      featured: false,
+      summary:
+        'O\'zbekiston viloyat va tumanlari bo\'yicha real vaqt rejimidagi harorat, shamol va atmosfera bosimini ko\'rsatuvchi interaktiv veb-sahifa.',
+      challenge:
+        'Geolokatsiya va ob-havo API ma\'lumotlarini qulay, tushunarli va vizual kartochkalar shaklida taqdim etish.',
+      solution:
+        'OpenWeather API va React yordamida tezkor, moslashuvchan va chiroyli interfeys tuzildi.',
+      impactMetric: 'O\'zbekiston viloyatlari ob-havo kartasi',
+      technologies: ['React', 'API Integration', 'Tailwind CSS'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_mobile_banking_1793267852640.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/weather-forecast-uz',
+      repoUrl: 'https://github.com/SolijonSolayev/weather-forecast-uz',
+    },
+    {
+      id: 'p_logistics_calc',
+      title: 'logistics-route-calculator — Transport Logistika Kalkulyatori',
+      category: 'Foydali dasturlar',
+      year: '2025',
+      client: 'Logistika va Oliy Ta\'lim amaliyoti',
+      role: 'Dasturchi',
+      featured: false,
+      summary:
+        'Transport logistikasi bo\'yicha masofa, yoqilg\'i sarfi, yuk hajmi va marshrut xarajatlarini avtomatik hisoblab beruvchi analitik kalkulyator.',
+      challenge:
+        'Logistika amaliyotida yuk tashish samaradorligini va xarajatlarni tezkor hisoblash uchun sodda kalkulyator yaratish.',
+      solution:
+        'Transport logistikasi formulalari asosida ishlaydigan va natijani jadval shaklida chiqaruvchi veb-dastur ishlab chiqildi.',
+      impactMetric: 'Transport Logistikasi va Marshrutlar Hisobi',
+      technologies: ['TypeScript', 'React', 'Logistics Algoritm'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_fintech_platform_1793267850542.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/logistics-route-calculator',
+      repoUrl: 'https://github.com/SolijonSolayev/logistics-route-calculator',
+    },
+    {
+      id: 'p_star_map',
+      title: 'interactive-star-map — Interaktiv Osmon Xaritasi va Yulduzlar',
+      category: 'Veb-loyihalar',
+      year: '2026',
+      client: 'Solaris 3D ekotizimi',
+      role: 'Frontend & 3D dasturchi',
+      featured: false,
+      summary:
+        'Tungi osmondagi burjlar, yulduz turkumlari va ravshan obyektlarni koordinatalar bo\'yicha qidirish va kuzatish imkonini beruvchi osmon xaritasi.',
+      challenge:
+        'Astronomik azimut va balandlik koordinatalarini 2D canvas hamda 3D sferada aniq simulyatsiya qilish.',
+      solution:
+        'HTML5 Canvas va Astronomiya koordinata formulalari asosida interaktiv osmon xaritasi tuzildi.',
+      impactMetric: 'Osmon sferasi va burjlar koordinata xaritasi',
+      technologies: ['HTML5 Canvas', 'TypeScript', 'Astronomiya Formula'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg'),
+      liveUrl: 'https://solaris3d.uz',
+      repoUrl: 'https://github.com/SolijonSolayev/interactive-star-map',
+    },
+    {
+      id: 'p_system_monitor',
+      title: 'system-monitor-cli — Protsessor va Kesh Kuzatuvi Utilitasi',
+      category: 'Foydali dasturlar',
+      year: '2025',
+      client: 'Tizim vositasi',
+      role: 'Muallif',
+      featured: false,
+      summary:
+        'Terminal rejimida kompyuter protsessori, operativ xotirasi va tizim keshini real vaqtda grafik ko\'rinishda kuzatib boruvchi Python CLI vositasi.',
+      challenge:
+        'Dasturchilar va tizim administratorlari uchun terminaldan chiqmasdan tizim resurslarini kuzatish imkoniyatini berish.',
+      solution:
+        'Python psutil va curses kutubxonalari yordamida tezkor terminal interfeysi yaratildi.',
+      impactMetric: 'CLI Terminal · Protsessor va RAM monitoringi',
+      technologies: ['Python', 'CLI', 'Tizim Diagnostikasi'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ai_analytics_1793267851074.jpg'),
+      liveUrl: 'https://github.com/SolijonSolayev/system-monitor-cli',
+      repoUrl: 'https://github.com/SolijonSolayev/system-monitor-cli',
+    },
+    {
+      id: 'p_youtube_darslar',
+      title: 'YouTube IT Video Darsliklar Portali (@Solijon_Solayev)',
+      category: 'Ochiq bilim va Media',
+      year: '2026',
+      client: 'YouTube IT Kanal',
+      role: 'Video muallif va o\'qituvchi',
+      featured: false,
+      summary:
+        'YouTube kanalida Python dasturlash, foydali dasturlar va veb-texnologiyalar bo\'yicha o\'zbek tilidagi amaliy video darsliklar va sharhlar.',
+      challenge:
+        'Dasturlash mavzularini vizual va tushunarli tarzda video qo\'llanmalar ko\'rinishida tayyorlash.',
+      solution:
+        'Amaliy amaliyotlar, kod namunalari va tushuntirishlar bilan boyitilgan YouTube platformasi yo\'lga qo\'yilgan.',
+      impactMetric: 'YouTube (@Solijon_Solayev) · IT Video Darsliklar',
+      technologies: ['YouTube', 'Python', 'Video Montaj', 'Ta\'lim'],
+      imageUrl: resolveAssetUrl('/src/assets/images/project_ecommerce_engine_1793267852059.jpg'),
+      liveUrl: 'https://www.youtube.com/@Solijon_Solayev',
+      repoUrl: 'https://www.youtube.com/@Solijon_Solayev',
     },
   ],
   experience: [

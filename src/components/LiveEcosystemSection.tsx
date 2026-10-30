@@ -245,6 +245,28 @@ async function fetchDirectWikimediaCommonsPool(): Promise<CommonsPhotoItem[]> {
   }
 }
 
+async function fetchDirectGitHubRepos(): Promise<GithubRepoItem[]> {
+  try {
+    const res = await fetch('https://api.github.com/users/SolijonSolayev/repos?sort=updated&per_page=100');
+    if (!res.ok) return [];
+    const repos = await res.json();
+    if (!Array.isArray(repos)) return [];
+    return repos.map((r, idx) => ({
+      id: r.id ?? idx + 1,
+      name: r.name || `repo-${idx + 1}`,
+      description: r.description || '',
+      url: r.html_url || `https://github.com/SolijonSolayev/${r.name || ''}`,
+      stars: typeof r.stargazers_count === 'number' ? r.stargazers_count : 0,
+      forks: typeof r.forks_count === 'number' ? r.forks_count : 0,
+      language: r.language || 'Web / Code',
+      updatedAt: r.updated_at || new Date().toISOString(),
+      homepage: r.homepage || '',
+    }));
+  } catch {
+    return [];
+  }
+}
+
 interface LiveEcosystemSectionProps {
   alphabetMode: UzbekAlphabetMode;
 }
@@ -272,9 +294,10 @@ export const LiveEcosystemSection: React.FC<LiveEcosystemSectionProps> = ({ alph
   const fetchLiveActivity = async () => {
     setLoading(true);
     try {
-      const [response, directCommonsPool] = await Promise.all([
+      const [response, directCommonsPool, directReposPool] = await Promise.all([
         fetch('/api/live-activity').catch(() => null),
         fetchDirectWikimediaCommonsPool(),
+        fetchDirectGitHubRepos(),
       ]);
 
       if (response && response.ok) {
@@ -291,7 +314,16 @@ export const LiveEcosystemSection: React.FC<LiveEcosystemSectionProps> = ({ alph
               updatedAt: r.updatedAt || new Date().toISOString(),
               homepage: r.homepage || '',
             }))
-          : FALLBACK_DATA.github.repos;
+          : [];
+
+        // Merge server repos and direct GitHub repos by unique name
+        const repoMap = new Map<string, GithubRepoItem>();
+        for (const r of [...normalizedRepos, ...directReposPool]) {
+          if (r && r.name && !repoMap.has(r.name)) {
+            repoMap.set(r.name, r);
+          }
+        }
+        const mergedRepos = repoMap.size > 0 ? Array.from(repoMap.values()) : FALLBACK_DATA.github.repos;
 
         const normalizedContribs: WikiContributionItem[] = Array.isArray(json.wikipedia?.contributions) && json.wikipedia.contributions.length
           ? json.wikipedia.contributions.map((c: Partial<WikiContributionItem> & { revId?: number; sizeDiff?: number }, idx: number) => ({
@@ -331,8 +363,11 @@ export const LiveEcosystemSection: React.FC<LiveEcosystemSectionProps> = ({ alph
           updatedAt: json.updatedAt || json.fetchedAt || new Date().toISOString(),
           github: {
             ...FALLBACK_DATA.github,
-            ...json.github,
-            repos: normalizedRepos,
+            profileUrl: json.github?.profileUrl || FALLBACK_DATA.github.profileUrl,
+            username: json.github?.username || FALLBACK_DATA.github.username,
+            publicRepos: Math.max(mergedRepos.length, json.github?.publicRepos || 0),
+            followers: json.github?.followers || FALLBACK_DATA.github.followers,
+            repos: mergedRepos,
           },
           wikipedia: {
             ...FALLBACK_DATA.wikipedia,
@@ -346,15 +381,22 @@ export const LiveEcosystemSection: React.FC<LiveEcosystemSectionProps> = ({ alph
           },
         });
         setShuffledPhotos(createShuffledPhotos(mergedPhotos));
-      } else if (directCommonsPool.length > 0) {
+      } else if (directReposPool.length > 0 || directCommonsPool.length > 0) {
+        const fallbackRepos = directReposPool.length > 0 ? directReposPool : FALLBACK_DATA.github.repos;
+        const fallbackPhotos = directCommonsPool.length > 0 ? directCommonsPool : FALLBACK_DATA.commons.photos;
         setData((prev) => ({
           ...prev,
+          github: {
+            ...prev.github,
+            publicRepos: fallbackRepos.length,
+            repos: fallbackRepos,
+          },
           commons: {
             ...prev.commons,
-            photos: directCommonsPool,
+            photos: fallbackPhotos,
           },
         }));
-        setShuffledPhotos(createShuffledPhotos(directCommonsPool));
+        setShuffledPhotos(createShuffledPhotos(fallbackPhotos));
       }
     } catch {
       // Keep fallback data if offline

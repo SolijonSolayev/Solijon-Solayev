@@ -19,7 +19,7 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
     telegram: 'https://taplink.cc/solijon_solayev',
     github: 'https://github.com/SolijonSolayev',
     linkedin: 'https://taplink.cc/solijon_solayev',
-    website: 'https://solijonsolayev.github.io/',
+    website: 'https://solijonsolayev.uz',
     youtube: 'https://www.youtube.com/@Solijon_Solayev',
     wikipedia: 'https://uz.wikipedia.org/wiki/Foydalanuvchi:Solijon_Solayev',
     commons: 'https://commons.wikimedia.org/wiki/User:Solijon_Solayev',

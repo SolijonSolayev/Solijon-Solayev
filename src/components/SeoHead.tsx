@@ -70,6 +70,8 @@ function escapeXml(unsafe: string): string {
     .replace(/'/g, '&apos;');
 }
 
+export const CANONICAL_ORIGIN = 'https://solijonsolayev.uz';
+
 function generateDynamicArticleOgSvgDataUri(
   post: BlogPostItem,
   authorName: string,
@@ -95,7 +97,7 @@ function generateDynamicArticleOgSvgDataUri(
     <text x="96" y="130" fill="#60a5fa" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" letter-spacing="2">${category.toUpperCase()} · ${readTime}</text>
     <text x="96" y="260" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="46" font-weight="800">${title}</text>
     <text x="96" y="510" fill="#e2e8f0" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="600">${author}</text>
-    <text x="96" y="548" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="22">${date} · solijonsolayev.vercel.app</text>
+    <text x="96" y="548" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="22">${date} · solijonsolayev.uz</text>
   </svg>`;
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -262,8 +264,8 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
   activeBlogPost = null,
 }) => {
   useEffect(() => {
-    const origin = window.location.origin;
-    const baseUrl = `${origin}${window.location.pathname}`;
+    const origin = CANONICAL_ORIGIN;
+    const baseUrl = `${origin}/`;
 
     let sectionHash = '';
     const params = new URLSearchParams();
@@ -276,14 +278,13 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
       params.set('article', slugOrId);
       sectionHash = `#blog/${encodeURIComponent(slugOrId)}`;
     } else if (activePage !== 'home') {
+      params.set('page', activePage);
       sectionHash = `#${activePage}`;
     }
 
     const queryString = params.toString();
     const querySuffix = queryString ? `?${queryString}` : '';
-    const canonicalUrl = activeBlogPost
-      ? `${baseUrl}${querySuffix}`
-      : `${baseUrl}${querySuffix}${sectionHash}`;
+    const canonicalUrl = `${baseUrl}${querySuffix}`;
 
     // Update <html lang="..."> attribute for search engines while keeping both scripts indexed
     document.documentElement.setAttribute(
@@ -393,22 +394,31 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     setOrCreateMeta('name', 'twitter:label2', socialMeta.twitterLabel2);
     setOrCreateMeta('name', 'twitter:data2', socialMeta.twitterData2);
 
-    // Canonical & alternate hreflang links for both alphabets
-    const articleQueryPart = activeBlogPost
+    // Canonical & alternate hreflang links for both alphabets & English
+    const pageOrArticleQuery = activeBlogPost
       ? `&article=${encodeURIComponent(activeBlogPost.slug || activeBlogPost.id)}`
+      : activePage !== 'home'
+      ? `&page=${encodeURIComponent(activePage)}`
       : '';
-    const defaultArticleQuery = activeBlogPost
+    const defaultPageOrArticleQuery = activeBlogPost
       ? `?article=${encodeURIComponent(activeBlogPost.slug || activeBlogPost.id)}`
-      : sectionHash;
+      : activePage !== 'home'
+      ? `?page=${encodeURIComponent(activePage)}`
+      : '';
 
     setOrCreateLink('canonical', canonicalUrl);
-    setOrCreateLink('alternate', `${baseUrl}?alphabet=new_2026${articleQueryPart}${sectionHash}`, {
+    setOrCreateLink('alternate', `${baseUrl}?alphabet=new_2026${pageOrArticleQuery}`, {
       hreflang: 'uz-Latn',
     });
-    setOrCreateLink('alternate', `${baseUrl}?alphabet=classic${articleQueryPart}${sectionHash}`, {
+    setOrCreateLink('alternate', `${baseUrl}?alphabet=classic${pageOrArticleQuery}`, {
       hreflang: 'uz',
     });
-    setOrCreateLink('alternate', `${baseUrl}${defaultArticleQuery}`, { hreflang: 'x-default' });
+    setOrCreateLink('alternate', `${baseUrl}?lang=en${pageOrArticleQuery}`, {
+      hreflang: 'en',
+    });
+    setOrCreateLink('alternate', `${baseUrl}${defaultPageOrArticleQuery}`, {
+      hreflang: 'x-default',
+    });
 
     // Dual-alphabet SEO keywords for Google, Yandex, and Bing
     const classicBio = toClassicUzbekLatin(rawProfile.personal.shortBio);
@@ -417,6 +427,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     const bilingualKeywords = [
       'Solijon Solayev',
       'Solijon_Solayev',
+      'solijonsolayev.uz',
       'solaris3d.uz',
       'Solaris 3D',
       'tilimlo.uz',
@@ -475,7 +486,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
           addressRegion: 'Xorazm',
           addressCountry: 'UZ',
         },
-        knowsLanguage: ['uz', 'uz-Latn'],
+        knowsLanguage: ['uz', 'uz-Latn', 'en'],
         knowsAbout: [
           'Frontend Web Development',
           'TypeScript',
@@ -487,6 +498,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
           'Uzbek Wikipedia & Wikimedia Commons Photography',
         ],
         sameAs: [
+          'https://solijonsolayev.uz',
           'https://solaris3d.uz',
           'https://tilimlo.uz',
           rawProfile.personal.taplink,
@@ -503,7 +515,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
         url: canonicalUrl,
         name: pageTitle,
         alternateName: 'Solijon Solayev — Şaxsiy Vizitka va IT Portfolio',
-        inLanguage: ['uz-Latn', 'uz'],
+        inLanguage: ['uz-Latn', 'uz', 'en'],
         mainEntity: {
           '@id': `${baseUrl}#person`,
         },
@@ -517,7 +529,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
         url: baseUrl,
         name: DEFAULT_SITE_TITLE,
         alternateName: 'Solijon Solayev — Şaxsiy Vizitka va IT Portfolio',
-        inLanguage: ['uz-Latn', 'uz'],
+        inLanguage: ['uz-Latn', 'uz', 'en'],
         author: {
           '@id': `${baseUrl}#person`,
         },
@@ -525,27 +537,27 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
           {
             '@type': 'WebPage',
             name: 'Men haqimda — Asosiy sahifa',
-            url: `${baseUrl}#men-haqimda`,
+            url: baseUrl,
           },
           {
             '@type': 'CollectionPage',
             name: 'Loyihalar — Solaris 3D, Tilimlo.uz va GitHub dasturlar',
-            url: `${baseUrl}#loyihalar`,
+            url: `${baseUrl}?page=loyihalar`,
           },
           {
             '@type': 'Blog',
             name: 'Shaxsiy Blog — «Fikr qilamiz» va IT maqolalar',
-            url: `${baseUrl}#blog`,
+            url: `${baseUrl}?page=blog`,
           },
           {
             '@type': 'ProfilePage',
             name: "Faoliyat, Ko'nikmalar va Jonli Ekotizim (GitHub, Vikipediya, Vikiombor)",
-            url: `${baseUrl}#tajriba`,
+            url: `${baseUrl}?page=tajriba`,
           },
           {
             '@type': 'ContactPage',
             name: "Bog'lanish va Murojaat",
-            url: `${baseUrl}#boglanish`,
+            url: `${baseUrl}?page=boglanish`,
           },
         ],
       },
@@ -557,31 +569,31 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
             '@type': 'ListItem',
             position: 1,
             name: 'Men haqimda',
-            item: `${baseUrl}#men-haqimda`,
+            item: baseUrl,
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Loyihalar',
-            item: `${baseUrl}#loyihalar`,
+            item: `${baseUrl}?page=loyihalar`,
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: 'Blog',
-            item: `${baseUrl}#blog`,
+            item: `${baseUrl}?page=blog`,
           },
           {
             '@type': 'ListItem',
             position: 4,
             name: 'Faoliyat va Jonli Ekotizim',
-            item: `${baseUrl}#tajriba`,
+            item: `${baseUrl}?page=tajriba`,
           },
           {
             '@type': 'ListItem',
             position: 5,
             name: "Bog'lanish",
-            item: `${baseUrl}#boglanish`,
+            item: `${baseUrl}?page=boglanish`,
           },
         ],
       },

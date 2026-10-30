@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import fs from 'fs';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -89,7 +90,7 @@ function isUrlOrEmail(token: string): boolean {
   ) {
     return true;
   }
-  return /\b(?:solaris3d\.uz|tilimlo\.uz|taplink\.cc|github\.com|github\.io|wikipedia\.org|wikimedia\.org|youtube\.com)\b/i.test(
+  return /\b(?:solijonsolayev\.uz|solaris3d\.uz|tilimlo\.uz|taplink\.cc|github\.com|github\.io|wikipedia\.org|wikimedia\.org|youtube\.com)\b/i.test(
     token
   );
 }
@@ -715,6 +716,29 @@ Maqola tarkibida:
       .send('105576dbc17fae66a68874553ed5a48a74212981fc2907467b6e77f6aa69c9e-certum.pl');
   });
 
+  const buildCanonicalPreviewUrl = (req: express.Request): string => {
+    const base = 'https://solijonsolayev.uz/';
+    const params = new URLSearchParams();
+    const article = typeof req.query.article === 'string' ? req.query.article.trim() : '';
+    const page = typeof req.query.page === 'string' ? req.query.page.trim() : '';
+    const alphabet = typeof req.query.alphabet === 'string' ? req.query.alphabet.trim() : '';
+    const lang = typeof req.query.lang === 'string' ? req.query.lang.trim() : '';
+
+    if (article) {
+      params.set('article', article);
+    } else if (page && page !== 'home') {
+      params.set('page', page);
+    }
+    if (alphabet === 'classic' || alphabet === 'new_2026') {
+      params.set('alphabet', alphabet);
+    }
+    if (lang === 'en') {
+      params.set('lang', 'en');
+    }
+    const qs = params.toString();
+    return `${base}${qs ? `?${qs}` : ''}`;
+  };
+
   const server = http.createServer(app);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -730,9 +754,29 @@ Maqola tarkibida:
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(__dirname, 'dist');
-    app.use(express.static(distPath, { dotfiles: 'allow' }));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    const indexHtmlPath = path.join(distPath, 'index.html');
+    app.use(express.static(distPath, { dotfiles: 'allow', index: false }));
+    app.get('*', (req, res) => {
+      try {
+        const canonicalPreviewUrl = buildCanonicalPreviewUrl(req);
+        const rawHtml = fs.readFileSync(indexHtmlPath, 'utf-8');
+        const hydratedHtml = rawHtml
+          .replace(
+            /<meta property="og:url"[^>]*content="[^"]*"[^>]*\/>/,
+            `<meta property="og:url" id="og-url-meta" content="${canonicalPreviewUrl}" />`
+          )
+          .replace(
+            /<meta name="twitter:url"[^>]*content="[^"]*"[^>]*\/>/,
+            `<meta name="twitter:url" id="twitter-url-meta" content="${canonicalPreviewUrl}" />`
+          )
+          .replace(
+            /<link rel="canonical"[^>]*href="[^"]*"[^>]*\/>/,
+            `<link rel="canonical" id="canonical-link" href="${canonicalPreviewUrl}" />`
+          );
+        res.type('text/html; charset=utf-8').send(hydratedHtml);
+      } catch (_err) {
+        res.sendFile(indexHtmlPath);
+      }
     });
   }
 

@@ -62,7 +62,7 @@ function isUrlOrPathOrEmail(token: string): boolean {
     return true;
   }
   if (
-    /\b(?:solaris3d\.uz|tilimlo\.uz|taplink\.cc|github\.com|github\.io|wikipedia\.org|wikimedia\.org|youtube\.com)\b/i.test(
+    /\b(?:solijonsolayev\.uz|solaris3d\.uz|tilimlo\.uz|taplink\.cc|github\.com|github\.io|wikipedia\.org|wikimedia\.org|youtube\.com)\b/i.test(
       token
     )
   ) {

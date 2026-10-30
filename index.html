@@ -157,25 +157,63 @@
     <meta property="og:title" content="Solijon Solayev — Shaxsiy Vizitka va IT Portfolio" />
     <meta property="og:description" content="Solijon Solayevning shaxsiy raqamli vizitkasi, IT portfeli (Solaris 3D, Tilimlo.uz), shaxsiy blogi, Vikipediya va Vikiombor jonli ekotizimi hamda ikki alifboli (Ö, Ğ, Ş, Ç va Oʻ, Gʻ, Sh, Ch) veb-platformasi." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" id="og-url-meta" content="https://solijonsolayev.uz/" />
     <meta property="og:site_name" content="Solijon Solayev — Shaxsiy Vizitka va IT Portfolio" />
     <meta property="og:locale" content="uz_UZ" />
     <meta property="og:locale:alternate" content="uz_Latn_UZ" />
-    <meta property="og:image" content="/images/hero_developer_workspace_1793267849323.jpg" />
+    <meta property="og:image" content="https://solijonsolayev.uz/images/hero_developer_workspace_1793267849323.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Solijon Solayev — Shaxsiy Vizitka, IT Portfolio, Blog va Vikiombor Ekotizimi" />
 
     <!-- Twitter / X Large Summary Cards -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" id="twitter-url-meta" content="https://solijonsolayev.uz/" />
     <meta name="twitter:title" content="Solijon Solayev — Shaxsiy Vizitka va IT Portfolio" />
     <meta name="twitter:description" content="Solijon Solayevning shaxsiy raqamli vizitkasi, IT portfeli (Solaris 3D, Tilimlo.uz), shaxsiy blogi, Vikipediya va Vikiombor jonli ekotizimi hamda ikki alifboli (Ö, Ğ, Ş, Ç va Oʻ, Gʻ, Sh, Ch) veb-platformasi." />
-    <meta name="twitter:image" content="/images/hero_developer_workspace_1793267849323.jpg" />
+    <meta name="twitter:image" content="https://solijonsolayev.uz/images/hero_developer_workspace_1793267849323.jpg" />
 
-    <!-- Bilingual Uzbek Alphabet Discovery Links, RSS & Sitemap -->
+    <!-- Canonical, Bilingual Uzbek Alphabet Discovery Links, RSS & Sitemap -->
+    <link rel="canonical" id="canonical-link" href="https://solijonsolayev.uz/" />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
-    <link rel="alternate" type="application/rss+xml" title="Solijon Solayev — Shaxsiy Blog RSS" href="/rss.xml" />
-    <link rel="alternate" hreflang="uz-Latn" href="https://solijonsolayev.github.io/?alphabet=new_2026" />
-    <link rel="alternate" hreflang="uz" href="https://solijonsolayev.github.io/?alphabet=classic" />
-    <link rel="alternate" hreflang="x-default" href="https://solijonsolayev.github.io/" />
+    <link rel="alternate" type="application/rss+xml" title="Solijon Solayev — Shaxsiy Blog RSS" href="https://solijonsolayev.uz/rss.xml" />
+    <link rel="alternate" hreflang="uz-Latn" href="https://solijonsolayev.uz/?alphabet=new_2026" />
+    <link rel="alternate" hreflang="uz" href="https://solijonsolayev.uz/?alphabet=classic" />
+    <link rel="alternate" hreflang="en" href="https://solijonsolayev.uz/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://solijonsolayev.uz/" />
     <link rel="author" type="text/plain" href="/llms.txt" />
+    <script>
+      (function () {
+        try {
+          var canonicalBase = 'https://solijonsolayev.uz/';
+          var searchParams = new URLSearchParams(window.location.search);
+          var cleanParams = new URLSearchParams();
+          var article = searchParams.get('article');
+          var page = searchParams.get('page');
+          var alphabet = searchParams.get('alphabet');
+          var lang = searchParams.get('lang');
+          if (article) {
+            cleanParams.set('article', article);
+          } else if (page && page !== 'home') {
+            cleanParams.set('page', page);
+          }
+          if (alphabet === 'classic' || alphabet === 'new_2026') {
+            cleanParams.set('alphabet', alphabet);
+          }
+          if (lang === 'en') {
+            cleanParams.set('lang', 'en');
+          }
+          var qs = cleanParams.toString();
+          var canonicalPreviewUrl = canonicalBase + (qs ? '?' + qs : '');
+          var ogUrlEl = document.getElementById('og-url-meta');
+          if (ogUrlEl) ogUrlEl.setAttribute('content', canonicalPreviewUrl);
+          var twUrlEl = document.getElementById('twitter-url-meta');
+          if (twUrlEl) twUrlEl.setAttribute('content', canonicalPreviewUrl);
+          var canLinkEl = document.getElementById('canonical-link');
+          if (canLinkEl) canLinkEl.setAttribute('href', canonicalPreviewUrl);
+        } catch (_e) {}
+      })();
+    </script>
 
     <!-- Static Baseline Schema.org Structured Data (Bilingual: 2026 New Uzbek Alphabet & Classic Uzbek Alphabet) -->
     <script type="application/ld+json">
@@ -184,8 +222,9 @@
         "@graph": [
           {
             "@type": "Person",
-            "@id": "https://solijonsolayev.github.io/#person",
+            "@id": "https://solijonsolayev.uz/#person",
             "name": "Solijon Solayev",
+            "url": "https://solijonsolayev.uz/",
             "alternateName": [
               "Solijon_Solayev",
               "Solijon Solayev — Frontend dasturçi",
@@ -201,6 +240,7 @@
               "addressCountry": "UZ"
             },
             "sameAs": [
+              "https://solijonsolayev.uz",
               "https://solaris3d.uz",
               "https://tilimlo.uz",
               "https://taplink.cc/solijon_solayev",
@@ -213,36 +253,37 @@
           },
           {
             "@type": "WebSite",
-            "@id": "https://solijonsolayev.github.io/#website",
+            "@id": "https://solijonsolayev.uz/#website",
+            "url": "https://solijonsolayev.uz/",
             "name": "Solijon Solayev — Shaxsiy Vizitka va IT Portfolio",
             "alternateName": "Solijon Solayev — Şaxsiy Vizitka va IT Portfolio",
-            "inLanguage": ["uz-Latn", "uz"],
+            "inLanguage": ["uz-Latn", "uz", "en"],
             "description": "Solijon Solayevning shaxsiy raqamli vizitkasi, IT portfeli (Solaris 3D, Tilimlo.uz), shaxsiy blogi, Vikipediya va Vikiombor jonli ekotizimi hamda ikki alifboli (Ö, Ğ, Ş, Ç va Oʻ, Gʻ, Sh, Ch) veb-platformasi.",
             "hasPart": [
               {
                 "@type": "WebPage",
                 "name": "Men haqimda — Asosiy sahifa",
-                "url": "https://solijonsolayev.github.io/#men-haqimda"
+                "url": "https://solijonsolayev.uz/"
               },
               {
                 "@type": "CollectionPage",
                 "name": "Loyihalar — Solaris 3D, Tilimlo.uz va GitHub dasturlar",
-                "url": "https://solijonsolayev.github.io/#loyihalar"
+                "url": "https://solijonsolayev.uz/?page=loyihalar"
               },
               {
                 "@type": "Blog",
                 "name": "Shaxsiy Blog — «Fikr qilamiz» va IT maqolalar",
-                "url": "https://solijonsolayev.github.io/#blog"
+                "url": "https://solijonsolayev.uz/?page=blog"
               },
               {
                 "@type": "ProfilePage",
                 "name": "Faoliyat, Ko'nikmalar va Jonli Ekotizim (GitHub, Vikipediya, Vikiombor)",
-                "url": "https://solijonsolayev.github.io/#tajriba"
+                "url": "https://solijonsolayev.uz/?page=tajriba"
               },
               {
                 "@type": "ContactPage",
                 "name": "Bog'lanish va Murojaat",
-                "url": "https://solijonsolayev.github.io/#boglanish"
+                "url": "https://solijonsolayev.uz/?page=boglanish"
               }
             ]
           }

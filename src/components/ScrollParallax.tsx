@@ -48,6 +48,7 @@ interface ParallaxMediaProps {
   onError?: () => void;
   className?: string;
   intensity?: number;
+  priority?: boolean;
 }
 
 /**
@@ -59,6 +60,7 @@ export const ParallaxImage: React.FC<ParallaxMediaProps> = ({
   onError,
   className = '',
   intensity = 18,
+  priority = false,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -85,6 +87,11 @@ export const ParallaxImage: React.FC<ParallaxMediaProps> = ({
       <motion.img
         src={src}
         alt={alt}
+        width={priority ? 960 : 720}
+        height={540}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
         referrerPolicy="no-referrer"
         onError={onError}
         style={{ y, scale: prefersReducedMotion ? 1 : 1.09 }}

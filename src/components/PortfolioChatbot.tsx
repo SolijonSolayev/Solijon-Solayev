@@ -284,7 +284,7 @@ export const PortfolioChatbot: React.FC<PortfolioChatbotProps> = ({
               whileTap={{ scale: 0.96 }}
               onClick={() => setOpen(true)}
               title={tr("AI Yordamchi · Savol so'rang")}
-              aria-label={tr('Virtual yordamchi chatini ochish')}
+              aria-label={tr('AI Yordamchi — Virtual yordamchi chatini ochish')}
               className="group flex items-center justify-center gap-2 h-10 w-10 sm:w-auto sm:px-3.5 rounded-full bg-[#0F0F12]/80 hover:bg-[#0F0F12]/95 backdrop-blur-md border border-zinc-800/90 hover:border-blue-500/50 text-zinc-300 hover:text-white shadow-lg transition-all cursor-pointer opacity-80 hover:opacity-100"
             >
               <MessageSquare className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors shrink-0" />

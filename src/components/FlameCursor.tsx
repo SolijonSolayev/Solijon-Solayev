@@ -220,9 +220,10 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
     const hctx = HD.getContext('2d');
     if (!ctx || !hctx) return;
 
-    let W = window.innerWidth;
-    let H = window.innerHeight;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W = 1280;
+    let H = 720;
+    let dpr = 1;
+    let isSized = false;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -239,10 +240,10 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
       HD.style.width = `${W}px`;
       HD.style.height = `${H}px`;
       hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      isSized = true;
     };
 
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener('resize', resize, { passive: true });
 
     /* ── Pointer state ── */
     const P = {
@@ -256,12 +257,38 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
       vy: 0,
       speed: 0,
       lastMove: 0,
+      initialized: false,
+    };
+
+    let last = performance.now();
+    let ambE = 0;
+    let ambF = 0;
+    let ambHD = 0;
+    let ambB = 0;
+    let rafId = 0;
+
+    const ensureRunning = () => {
+      if (!isSized) {
+        resize();
+      }
+      if (!rafId) {
+        last = performance.now();
+        rafId = requestAnimationFrame(frame);
+      }
     };
 
     const setTarget = (x: number, y: number) => {
+      if (!P.initialized) {
+        P.x = x;
+        P.y = y;
+        P.px = x;
+        P.py = y;
+        P.initialized = true;
+      }
       P.tx = x;
       P.ty = y;
       P.lastMove = performance.now();
+      ensureRunning();
     };
 
     /* ══════════════════════════════════════════
@@ -663,6 +690,7 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
     };
     const onMouseDown = (e: MouseEvent) => {
       document.body.classList.add('aura-active');
+      setTarget(e.clientX, e.clientY);
       burst(e.clientX, e.clientY);
     };
     const onMouseUp = () => document.body.classList.remove('aura-active');
@@ -676,25 +704,25 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
     };
     const onTouchEnd = () => document.body.classList.remove('aura-active');
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
-    window.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('mousedown', onMouseDown, { passive: true });
+    window.addEventListener('mouseup', onMouseUp, { passive: true });
+    window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
 
     /* ══════════════════════════════════════════
        MAIN LOOP
     ══════════════════════════════════════════ */
-    let last = performance.now();
-    let ambE = 0;
-    let ambF = 0;
-    let ambHD = 0;
-    let ambB = 0;
-    let rafId = 0;
-
     const frame = (now: number) => {
+      const idle = now - P.lastMove;
+      if (idle > 1600 && waves.length === 0 && flashes.length === 0 && fireRings.length === 0) {
+        ctx.clearRect(0, 0, W, H);
+        hctx.clearRect(0, 0, W, H);
+        rafId = 0;
+        return;
+      }
       rafId = requestAnimationFrame(frame);
       const dt = Math.min(now - last, 33);
       last = now;
@@ -712,7 +740,6 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
       addTrail(P.x, P.y, now);
       while (trail.length && now - trail[0].t > 320) trail.shift();
 
-      const idle = now - P.lastMove;
       const moving = idle < 120;
       const speedFactor = clamp(P.speed / 300, 0, 1);
 
@@ -1265,10 +1292,8 @@ export const FlameCursor: React.FC<FlameCursorProps> = ({ enabled = true }) => {
       }
     };
 
-    rafId = requestAnimationFrame(frame);
-
     return () => {
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchmove', onTouchMove);

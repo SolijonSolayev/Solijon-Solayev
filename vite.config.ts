@@ -11,6 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: 'script-defer',
         devOptions: {
           enabled: true,
         },
@@ -59,7 +60,7 @@ export default defineConfig(() => {
         },
         workbox: {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
           navigateFallbackDenylist: [
             /^\/sitemap\.xml$/i,
             /^\/robots\.txt$/i,
@@ -103,6 +104,29 @@ export default defineConfig(() => {
         },
       }),
     ],
+    build: {
+      sourcemap: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('firebase') || id.includes('@firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('motion') || id.includes('framer-motion')) {
+                return 'vendor-motion';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+              if (id.includes('react') || id.includes('scheduler')) {
+                return 'vendor-react';
+              }
+            }
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve('.'),
@@ -117,4 +141,3 @@ export default defineConfig(() => {
     },
   };
 });
-

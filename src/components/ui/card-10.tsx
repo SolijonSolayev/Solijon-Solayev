@@ -82,6 +82,10 @@ export const Card10: React.FC<Card10Props> = ({
             <img
               src={imageUrl}
               alt={title}
+              width={720}
+              height={405}
+              loading="lazy"
+              decoding="async"
               referrerPolicy="no-referrer"
               onError={() => setImgFailed(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -190,7 +194,7 @@ export const Card10: React.FC<Card10Props> = ({
             <div className="mt-3 pt-3 border-t border-zinc-800/80 grid grid-cols-2 gap-3 text-xs">
               {subMetrics.map((sm, idx) => (
                 <div key={idx} className="space-y-0.5">
-                  <span className="text-[11px] text-zinc-500 block truncate">{sm.label}</span>
+                  <span className="text-[11px] text-zinc-400 block truncate">{sm.label}</span>
                   <span className="font-mono-tabular font-semibold text-zinc-200">{sm.value}</span>
                 </div>
               ))}

@@ -209,7 +209,7 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
                     className="group inline-flex items-center justify-between w-full text-zinc-400 hover:text-white transition-colors cursor-pointer text-left"
                   >
                     <span>{getTranslation(item.labelKey, language, alphabetMode)}</span>
-                    <span className="text-[10px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors">
+                    <span className="text-[10px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors">
                       {tr(item.badge)}
                     </span>
                   </button>
@@ -239,7 +239,7 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
                     className="group inline-flex items-center justify-between w-full text-zinc-400 hover:text-white transition-colors"
                   >
                     <span className="truncate pr-2">{tr(proj.name)}</span>
-                    <span className="text-[10px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors shrink-0">
+                    <span className="text-[10px] font-mono-tabular px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors shrink-0">
                       {tr(proj.badge)}
                     </span>
                   </a>
@@ -260,7 +260,7 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
                   className="group inline-flex items-center justify-between w-full text-zinc-400 hover:text-white transition-colors"
                 >
                   <span className="truncate pr-2">{profile?.personal?.email || 'solijonsolayev2003@gmail.com'}</span>
-                  <Mail className="w-3.5 h-3.5 text-zinc-500 group-hover:text-blue-400 transition-colors shrink-0" />
+                  <Mail className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-400 transition-colors shrink-0" />
                 </a>
               </li>
               <li>
@@ -271,7 +271,7 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
                   className="group inline-flex items-center justify-between w-full text-zinc-400 hover:text-white transition-colors"
                 >
                   <span>Telegram (@solijon_solayev)</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-blue-400 transition-colors shrink-0" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-400 transition-colors shrink-0" />
                 </a>
               </li>
               <li>
@@ -310,9 +310,9 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
           </h1>
 
           {/* Copyright Row */}
-          <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 pt-6 border-t border-zinc-800/60 mt-4">
+          <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400 pt-6 border-t border-zinc-800/60 mt-4">
             <div className="flex items-center gap-2">
-              <span className="text-zinc-300 font-semibold">{fullName}</span>
+              <span className="text-zinc-200 font-semibold">{fullName}</span>
               <span aria-hidden="true">·</span>
               <span>© 2026 {tr('Barcha huquqlar himoyalangan')}</span>
             </div>
@@ -323,7 +323,7 @@ export const BeamWordmarkFooter: React.FC<BeamWordmarkFooterProps> = ({
                 {location}
               </span>
               <span aria-hidden="true">·</span>
-              <span className="text-zinc-500 font-mono-tabular">
+              <span className="text-zinc-400 font-mono-tabular">
                 v2.6.0 · AI Studio Build
               </span>
             </div>

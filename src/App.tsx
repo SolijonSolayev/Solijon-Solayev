@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { User } from 'firebase/auth';
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+import type { User } from 'firebase/auth';
 import {
   AnimatePresence,
   motion,
@@ -47,30 +47,40 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import { AdminPanelView } from './components/AdminPanelView';
 import { BeamWordmarkFooter } from '@/components/ui/beam-wordmark-footer';
-import { BlogArticleView, formatUzbekDate } from './components/BlogArticleView';
 import { Card10 } from '@/components/ui/card-10';
-import { CommandPaletteModal } from './components/CommandPaletteModal';
-import { DigitalCardModal } from './components/DigitalCardModal';
-import { FlameCursor } from './components/FlameCursor';
-import { LiveEcosystemSection } from './components/LiveEcosystemSection';
 import { OfflineIndicator } from './components/OfflineIndicator';
-import { PortfolioChatbot } from './components/PortfolioChatbot';
-import { ProjectLightbox } from './components/ProjectLightbox';
 import { PWAInstallButton } from './components/PWAInstallButton';
 import { ParallaxImage, ParallaxLayer } from './components/ScrollParallax';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { SeoHead } from './components/SeoHead';
 import { SpotlightCard } from './components/SpotlightCard';
+
+const AdminPanelView = lazy(() =>
+  import('./components/AdminPanelView').then((m) => ({ default: m.AdminPanelView }))
+);
+const BlogArticleView = lazy(() =>
+  import('./components/BlogArticleView').then((m) => ({ default: m.BlogArticleView }))
+);
+const CommandPaletteModal = lazy(() =>
+  import('./components/CommandPaletteModal').then((m) => ({ default: m.CommandPaletteModal }))
+);
+const DigitalCardModal = lazy(() =>
+  import('./components/DigitalCardModal').then((m) => ({ default: m.DigitalCardModal }))
+);
+const FlameCursor = lazy(() =>
+  import('./components/FlameCursor').then((m) => ({ default: m.FlameCursor }))
+);
+const LiveEcosystemSection = lazy(() =>
+  import('./components/LiveEcosystemSection').then((m) => ({ default: m.LiveEcosystemSection }))
+);
+const PortfolioChatbot = lazy(() =>
+  import('./components/PortfolioChatbot').then((m) => ({ default: m.PortfolioChatbot }))
+);
+const ProjectLightbox = lazy(() =>
+  import('./components/ProjectLightbox').then((m) => ({ default: m.ProjectLightbox }))
+);
 import { DEFAULT_PROFILE_DATA } from './data/defaultProfile';
-import {
-  createContactInquiry,
-  isUserVerifiedAdmin,
-  savePortfolioToFirestore,
-  subscribeToAuth,
-  subscribeToPortfolio,
-} from './lib/firebase';
 import {
   BlogCategory,
   BlogPostItem,
@@ -97,6 +107,29 @@ import { getCanonicalRepoKey } from './utils/githubHelpers';
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
 export type ThemeMode = 'dark' | 'light';
 export const THEME_STORAGE_KEY = 'solijon_theme_mode';
+
+function formatUzbekDate(dateStr: string, mode: UzbekAlphabetMode): string {
+  const tr = (t: string) => formatUzbekText(t, mode);
+  if (!dateStr) return '';
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return tr(dateStr);
+  const months = [
+    'yanvar',
+    'fevral',
+    'mart',
+    'aprel',
+    'may',
+    'iyun',
+    'iyul',
+    'avgust',
+    'sentabr',
+    'oktabr',
+    'noyabr',
+    'dekabr',
+  ];
+  const monthName = months[parseInt(match[2], 10) - 1] || match[2];
+  return tr(`${parseInt(match[3], 10)}-${monthName}, ${match[1]}-yil`);
+}
 
 function resolvePageFromHash(hash: string, search: string = ''): ActiveSectionPage {
   try {
@@ -380,14 +413,19 @@ export default function App() {
   });
 
   useEffect(() => {
-    const unsubAuth = subscribeToAuth((user) => {
-      setCurrentUser(user);
-    });
-    const unsubPortfolio = subscribeToPortfolio((cloudProfile) => {
-      if (cloudProfile) {
-        setRawProfile(cloudProfile);
-      }
-    });
+    let unsubPortfolio: (() => void) | null = null;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void import('./lib/firebase').then(({ subscribeToPortfolio }) => {
+        if (cancelled) return;
+        unsubPortfolio = subscribeToPortfolio((cloudProfile) => {
+          if (cloudProfile) {
+            setRawProfile(cloudProfile);
+          }
+        });
+      });
+    }, 2200);
+
     const handleUrlStateChange = () => {
       const hash = window.location.hash;
       setIsAdminRoute(hash === '#admin');
@@ -413,13 +451,30 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      unsubAuth();
-      unsubPortfolio();
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (unsubPortfolio) unsubPortfolio();
       window.removeEventListener('hashchange', handleUrlStateChange);
       window.removeEventListener('popstate', handleUrlStateChange);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAdminRoute) return;
+    let unsubAuth: (() => void) | null = null;
+    let cancelled = false;
+    void import('./lib/firebase').then(({ subscribeToAuth }) => {
+      if (cancelled) return;
+      unsubAuth = subscribeToAuth((user) => {
+        setCurrentUser(user);
+      });
+    });
+    return () => {
+      cancelled = true;
+      if (unsubAuth) unsubAuth();
+    };
+  }, [isAdminRoute]);
 
   // Fetch all public GitHub repositories for SolijonSolayev in real-time, update existing items with live metrics, and append new ones with 0 duplicates
   useEffect(() => {
@@ -488,22 +543,22 @@ export default function App() {
               category = 'Ochiq bilim va Media';
             }
 
-            let imageUrl = '/src/assets/images/project_ai_analytics_1793267851074.jpg';
+            let imageUrl = '/images/project_ai_analytics_1793267851074.webp';
             if (lowerName.includes('solaris')) {
-              imageUrl = '/src/assets/images/project_solaris3d_astronomy_1793272827947.jpg';
+              imageUrl = '/images/project_solaris3d_astronomy_1793272827947.webp';
             } else if (lowerName.includes('tilimlo')) {
-              imageUrl = '/src/assets/images/project_tilimlo_platform_1793272827504.jpg';
+              imageUrl = '/images/project_tilimlo_platform_1793272827504.webp';
             } else if (lowerName.includes('formatter') || lowerName.includes('usb')) {
-              imageUrl = '/src/assets/images/project_fintech_platform_1793267850542.jpg';
+              imageUrl = '/images/project_fintech_platform_1793267850542.webp';
             } else if (lowerName.includes('tozalash') || lowerName.includes('clean')) {
-              imageUrl = '/src/assets/images/project_mobile_banking_1793267852640.jpg';
+              imageUrl = '/images/project_mobile_banking_1793267852640.webp';
             } else if (
               lowerName.includes('kvadrat') ||
               lowerName.includes('math') ||
               lowerName.includes('beauty') ||
               lowerName.includes('sayohat')
             ) {
-              imageUrl = '/src/assets/images/project_ecommerce_engine_1793267852059.jpg';
+              imageUrl = '/images/project_ecommerce_engine_1793267852059.webp';
             }
 
             const existingP = projectKeyMap.get(repoKey);
@@ -567,7 +622,11 @@ export default function App() {
     };
   }, []);
 
-  const isAdmin = isUserVerifiedAdmin(currentUser);
+  const isAdmin = Boolean(
+    currentUser &&
+      currentUser.emailVerified &&
+      currentUser.email?.toLowerCase() === 'solijonsolayev2003@gmail.com'
+  );
   const [confirmQuickDeletePostId, setConfirmQuickDeletePostId] = useState<string | null>(null);
 
   const navigateToPage = (page: ActiveSectionPage) => {
@@ -614,6 +673,7 @@ export default function App() {
     setRawProfile(nextProfile);
     setConfirmQuickDeletePostId(null);
     try {
+      const { savePortfolioToFirestore } = await import('./lib/firebase');
       await savePortfolioToFirestore(nextProfile);
     } catch {
       // Local state is already updated
@@ -728,6 +788,7 @@ export default function App() {
     if (!senderName.trim() || !senderContact.trim() || isSendingInquiry) return;
     setIsSendingInquiry(true);
     try {
+      const { createContactInquiry } = await import('./lib/firebase');
       await createContactInquiry({
         senderName,
         senderContact,
@@ -744,7 +805,7 @@ export default function App() {
 
   if (isAdminRoute) {
     return (
-      <>
+      <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
         <ScrollProgressBar themeMode={themeMode} />
         <FlameCursor enabled={flameCursorEnabled} />
         <AdminPanelView
@@ -757,13 +818,13 @@ export default function App() {
           initialEditPostId={adminInitialEditPostId}
           onClearInitialEditPost={() => setAdminInitialEditPostId(null)}
         />
-      </>
+      </Suspense>
     );
   }
 
   if (activeBlogPost) {
     return (
-      <>
+      <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
         <ScrollProgressBar themeMode={themeMode} />
         <FlameCursor enabled={flameCursorEnabled} />
         <SeoHead
@@ -795,29 +856,31 @@ export default function App() {
           isOpenExternal={isChatbotOpen}
           onOpenChangeExternal={setIsChatbotOpen}
         />
-        <CommandPaletteModal
-          isOpen={isCommandPaletteOpen}
-          onClose={() => setIsCommandPaletteOpen(false)}
-          profile={profile}
-          alphabetMode={alphabetMode}
-          themeMode={themeMode}
-          onToggleTheme={toggleThemeMode}
-          onToggleAlphabet={() =>
-            handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
-          }
-          onSelectBlogPost={(post) => openBlogPost(post)}
-          onSelectProject={(proj) => {
-            closeBlogPost();
-            setActiveProjectId(proj.id);
-          }}
-          onDownloadVCard={() => downloadVCard(profile)}
-          onOpenQrModal={() => {
-            closeBlogPost();
-            setIsCardModalOpen(true);
-          }}
-          onOpenAiChat={() => setIsChatbotOpen(true)}
-        />
-      </>
+        {isCommandPaletteOpen && (
+          <CommandPaletteModal
+            isOpen={isCommandPaletteOpen}
+            onClose={() => setIsCommandPaletteOpen(false)}
+            profile={profile}
+            alphabetMode={alphabetMode}
+            themeMode={themeMode}
+            onToggleTheme={toggleThemeMode}
+            onToggleAlphabet={() =>
+              handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
+            }
+            onSelectBlogPost={(post) => openBlogPost(post)}
+            onSelectProject={(proj) => {
+              closeBlogPost();
+              setActiveProjectId(proj.id);
+            }}
+            onDownloadVCard={() => downloadVCard(profile)}
+            onOpenQrModal={() => {
+              closeBlogPost();
+              setIsCardModalOpen(true);
+            }}
+            onOpenAiChat={() => setIsChatbotOpen(true)}
+          />
+        )}
+      </Suspense>
     );
   }
 
@@ -827,7 +890,9 @@ export default function App() {
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col relative selection:bg-blue-600/30 selection:text-white">
       <ScrollProgressBar themeMode={themeMode} />
       <OfflineIndicator lang={language} alphabetMode={alphabetMode} />
-      <FlameCursor enabled={flameCursorEnabled} />
+      <Suspense fallback={null}>
+        <FlameCursor enabled={flameCursorEnabled} />
+      </Suspense>
       <SeoHead
         rawProfile={rawProfile}
         alphabetMode={alphabetMode}
@@ -957,17 +1022,21 @@ export default function App() {
                 ? getTranslation('soundMute', language, alphabetMode)
                 : getTranslation('soundUnmute', language, alphabetMode)
             }
-            aria-label={soundEnabled ? 'Mute audio' : 'Enable audio'}
+            aria-label={`${getTranslation('sound', language, alphabetMode)} — ${
+              soundEnabled
+                ? getTranslation('soundMute', language, alphabetMode)
+                : getTranslation('soundUnmute', language, alphabetMode)
+            }`}
             className={`hidden sm:inline-flex px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border transition-all items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               soundEnabled
                 ? 'bg-blue-600/15 border-blue-500/40 text-blue-300 hover:bg-blue-600/25'
-                : 'bg-[#0F0F12] border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
+                : 'bg-[#0F0F12] border-zinc-800 text-zinc-400 hover:text-zinc-300 hover:border-zinc-700'
             }`}
           >
             {soundEnabled ? (
               <Volume2 className="w-3.5 h-3.5 text-blue-400" />
             ) : (
-              <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+              <VolumeX className="w-3.5 h-3.5 text-zinc-400" />
             )}
             <span className="hidden xl:inline">{getTranslation('sound', language, alphabetMode)}</span>
           </button>
@@ -977,7 +1046,7 @@ export default function App() {
             type="button"
             onClick={() => handleLanguageChange(language === 'uz' ? 'en' : 'uz')}
             title={language === 'uz' ? 'Switch interface to English' : "Interfeysni o'zbek tiliga o'tkazish"}
-            aria-label="Language Switcher"
+            aria-label={language === 'uz' ? 'OʻZ — Switch interface to English' : "EN — Interfeysni o'zbek tiliga o'tkazish"}
             className="px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border border-zinc-800 bg-[#0F0F12] text-zinc-300 hover:text-white hover:border-zinc-700 transition-all inline-flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5 text-blue-400" />
@@ -995,8 +1064,8 @@ export default function App() {
             }
             aria-label={
               themeMode === 'dark'
-                ? getTranslation('dayMode', language, alphabetMode)
-                : getTranslation('nightMode', language, alphabetMode)
+                ? `${getTranslation('dayMode', language, alphabetMode)} — ${getTranslation('toDayMode', language, alphabetMode)}`
+                : `${getTranslation('nightMode', language, alphabetMode)} — ${getTranslation('toNightMode', language, alphabetMode)}`
             }
             className={`px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
               themeMode === 'light'
@@ -1235,7 +1304,11 @@ export default function App() {
                       ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
                       : tr("Tungi rejimga o'tish (Qorong'i)")
                   }
-                  aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+                  aria-label={
+                    themeMode === 'dark'
+                      ? `${tr('Kun')} — ${tr('Kunduzgi rejim')}`
+                      : `${tr('Tun')} — ${tr('Tungi rejim')}`
+                  }
                   className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     themeMode === 'light'
                       ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
@@ -1357,7 +1430,11 @@ export default function App() {
                     ? tr("Kunduzgi hashamatli rejimga o'tish (Oq-sariq va oltin-qum)")
                     : tr("Tungi rejimga o'tish (Qorong'i)")
                 }
-                aria-label={themeMode === 'dark' ? tr("Kunduzgi rejim") : tr("Tungi rejim")}
+                aria-label={
+                  themeMode === 'dark'
+                    ? `${tr('Kun')} — ${tr('Kunduzgi rejim')}`
+                    : `${tr('Tun')} — ${tr('Tungi rejim')}`
+                }
                 className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                   themeMode === 'light'
                     ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25'
@@ -1582,6 +1659,7 @@ export default function App() {
                       alt={tr(`${personal.fullName} ish stoli va dasturlash muhiti`)}
                       onError={() => setHeroImgError(true)}
                       intensity={22}
+                      priority={true}
                       className="transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -2687,7 +2765,9 @@ export default function App() {
         </section>
 
         {/* Real-Time Open-Source, Uzbek Wikipedia & Wikimedia Commons Live Ecosystem Section */}
-        <LiveEcosystemSection alphabetMode={alphabetMode} />
+        <Suspense fallback={null}>
+          <LiveEcosystemSection alphabetMode={alphabetMode} />
+        </Suspense>
           </>
         )}
 
@@ -3070,43 +3150,50 @@ export default function App() {
       />
 
       {/* Interactive Modals */}
-      <DigitalCardModal
-        isOpen={isCardModalOpen}
-        onClose={() => setIsCardModalOpen(false)}
-        profile={profile}
-        alphabetMode={alphabetMode}
-      />
+      <Suspense fallback={null}>
+        {isCardModalOpen && (
+          <DigitalCardModal
+            isOpen={isCardModalOpen}
+            onClose={() => setIsCardModalOpen(false)}
+            profile={profile}
+            alphabetMode={alphabetMode}
+          />
+        )}
 
-      <ProjectLightbox
-        project={activeProject}
-        onClose={() => setActiveProjectId(null)}
-        alphabetMode={alphabetMode}
-      />
+        {activeProject && (
+          <ProjectLightbox
+            project={activeProject}
+            onClose={() => setActiveProjectId(null)}
+            alphabetMode={alphabetMode}
+          />
+        )}
 
-      <PortfolioChatbot
-        profile={profile}
-        alphabetMode={alphabetMode}
-        onAlphabetModeChange={handleAlphabetChange}
-        isOpenExternal={isChatbotOpen}
-        onOpenChangeExternal={setIsChatbotOpen}
-      />
-
-      <CommandPaletteModal
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        profile={profile}
-        alphabetMode={alphabetMode}
-        themeMode={themeMode}
-        onToggleTheme={toggleThemeMode}
-        onToggleAlphabet={() =>
-          handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
-        }
-        onSelectBlogPost={(post) => openBlogPost(post)}
-        onSelectProject={(proj) => setActiveProjectId(proj.id)}
-        onDownloadVCard={() => downloadVCard(profile)}
-        onOpenQrModal={() => setIsCardModalOpen(true)}
-        onOpenAiChat={() => setIsChatbotOpen(true)}
-      />
+        {isCommandPaletteOpen && (
+          <CommandPaletteModal
+            isOpen={isCommandPaletteOpen}
+            onClose={() => setIsCommandPaletteOpen(false)}
+            profile={profile}
+            alphabetMode={alphabetMode}
+            themeMode={themeMode}
+            onToggleTheme={toggleThemeMode}
+            onToggleAlphabet={() =>
+              handleAlphabetChange(alphabetMode === 'new_2026' ? 'classic' : 'new_2026')
+            }
+            onSelectBlogPost={(post) => openBlogPost(post)}
+            onSelectProject={(proj) => setActiveProjectId(proj.id)}
+            onDownloadVCard={() => downloadVCard(profile)}
+            onOpenQrModal={() => setIsCardModalOpen(true)}
+            onOpenAiChat={() => setIsChatbotOpen(true)}
+          />
+        )}
+        <PortfolioChatbot
+          profile={profile}
+          alphabetMode={alphabetMode}
+          onAlphabetModeChange={handleAlphabetChange}
+          isOpenExternal={isChatbotOpen}
+          onOpenChangeExternal={setIsChatbotOpen}
+        />
+      </Suspense>
     </div>
   );
 }

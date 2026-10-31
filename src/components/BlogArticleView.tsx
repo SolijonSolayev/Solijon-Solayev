@@ -359,6 +359,44 @@ export const MarkdownArticleContent: React.FC<MarkdownArticleContentProps> = ({
         continue;
       }
 
+      // Standalone Markdown Image ![alt](url)
+      const imageMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (imageMatch) {
+        const altText = imageMatch[1].trim() || tr('Maqola tasviri');
+        const imgSrc = imageMatch[2].trim();
+        const startIdx = i;
+        i++;
+        nodes.push(
+          <figure
+            key={`img-${startIdx}`}
+            className="my-6 rounded-2xl overflow-hidden bg-[#0F0F12] border border-zinc-800"
+          >
+            <div
+              className="relative w-full aspect-video bg-[#09090D] overflow-hidden"
+              style={{ aspectRatio: '16 / 9' }}
+            >
+              <img
+                src={imgSrc}
+                alt={altText}
+                width={960}
+                height={540}
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                style={{ aspectRatio: '16 / 9' }}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {altText && (
+              <figcaption className="px-4 py-2.5 text-xs text-zinc-400 border-t border-zinc-800/80 text-center">
+                {altText}
+              </figcaption>
+            )}
+          </figure>
+        );
+        continue;
+      }
+
       // Standard paragraph
       const paraLines: string[] = [];
       const startIdx = i;
@@ -368,6 +406,7 @@ export const MarkdownArticleContent: React.FC<MarkdownArticleContentProps> = ({
         !lines[i].trim().startsWith('```') &&
         !lines[i].trim().startsWith('##') &&
         !lines[i].trim().startsWith('>') &&
+        !/^!\[([^\]]*)\]\(([^)]+)\)$/.test(lines[i].trim()) &&
         !/^[-*]\s+/.test(lines[i].trim()) &&
         !/^\d+\.\s+/.test(lines[i].trim())
       ) {
@@ -416,6 +455,8 @@ export const BlogArticleView: React.FC<BlogArticleViewProps> = ({
   onToggleTheme,
 }) => {
   const [imgFailed, setImgFailed] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [failedRelatedImages, setFailedRelatedImages] = useState<Record<string, boolean>>({});
   const [copiedLink, setCopiedLink] = useState(false);
 
   // AI Audio Listening (TTS) state
@@ -434,6 +475,7 @@ export const BlogArticleView: React.FC<BlogArticleViewProps> = ({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setImgFailed(false);
+    setImgLoaded(false);
     // Stop any playing audio when switching articles
     if (audioRef.current) {
       audioRef.current.pause();
@@ -942,21 +984,38 @@ ${post.content}
           </div>
         </motion.div>
 
-        {/* Cover Image Banner */}
+        {/* Cover Image Banner with Aspect-Ratio Placeholder & Lazy Loading */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
           className="my-10 rounded-2xl overflow-hidden bg-[#0F0F12] border border-zinc-800 aspect-video max-h-[460px] w-full relative"
+          style={{ aspectRatio: '16 / 9' }}
         >
           {!imgFailed && post.imageUrl ? (
-            <img
-              src={post.imageUrl}
-              alt={post.title}
-              referrerPolicy="no-referrer"
-              onError={() => setImgFailed(true)}
-              className="w-full h-full object-cover"
-            />
+            <>
+              {!imgLoaded && (
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-r from-zinc-900/90 via-zinc-800/40 to-zinc-900/90 animate-pulse"
+                />
+              )}
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                width={1200}
+                height={675}
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgFailed(true)}
+                style={{ aspectRatio: '16 / 9' }}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  imgLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
               <BookOpen className="w-10 h-10 text-blue-500/60 mb-3" />
@@ -1237,41 +1296,74 @@ ${post.content}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {relatedPosts.map((rel) => (
-                <SpotlightCard
-                  key={rel.id}
-                  as="article"
-                  onClick={() => onSelectPost(rel.id)}
-                  className="p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 transition-colors flex flex-col justify-between space-y-4 cursor-pointer group"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      <span className="text-blue-400">{tr(rel.category)}</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="font-mono-tabular">
-                        {formatUzbekDate(rel.publishedAt, alphabetMode)}
-                      </span>
-                      <span aria-hidden="true">·</span>
-                      <span className="font-mono-tabular">{rel.readTime}</span>
+              {relatedPosts.map((rel) => {
+                const relFailed = failedRelatedImages[rel.id];
+                return (
+                  <SpotlightCard
+                    key={rel.id}
+                    as="article"
+                    onClick={() => onSelectPost(rel.id)}
+                    className="rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden transition-colors flex flex-col justify-between cursor-pointer group"
+                  >
+                    <div
+                      className="relative aspect-video w-full overflow-hidden bg-[#050505] border-b border-zinc-800"
+                      style={{ aspectRatio: '16 / 9' }}
+                    >
+                      {!relFailed && rel.imageUrl ? (
+                        <img
+                          src={rel.imageUrl}
+                          alt={rel.title}
+                          width={560}
+                          height={315}
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                          onError={() =>
+                            setFailedRelatedImages((prev) => ({ ...prev, [rel.id]: true }))
+                          }
+                          style={{ aspectRatio: '16 / 9' }}
+                          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
+                          <BookOpen className="w-8 h-8 text-blue-500/60 mb-2" />
+                          <span className="text-xs text-zinc-400">{tr(rel.category)}</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
                     </div>
-                    <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
-                      {rel.title}
-                    </h3>
-                    <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed">
-                      {rel.excerpt}
-                    </p>
-                  </div>
 
-                  <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs">
-                    <span className="text-zinc-500 font-mono-tabular">
-                      {rel.tags.slice(0, 3).map((t) => `#${t}`).join(' · ')}
-                    </span>
-                    <span className="text-white font-medium group-hover:text-blue-400 transition-colors inline-flex items-center gap-1">
-                      {tr("To'liq o'qish")} <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                </SpotlightCard>
-              ))}
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2.5">
+                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                          <span className="text-blue-400">{tr(rel.category)}</span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-mono-tabular">
+                            {formatUzbekDate(rel.publishedAt, alphabetMode)}
+                          </span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-mono-tabular">{rel.readTime}</span>
+                        </div>
+                        <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
+                          {rel.title}
+                        </h3>
+                        <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed">
+                          {rel.excerpt}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs">
+                        <span className="text-zinc-500 font-mono-tabular">
+                          {rel.tags.slice(0, 3).map((t) => `#${t}`).join(' · ')}
+                        </span>
+                        <span className="text-white font-medium group-hover:text-blue-400 transition-colors inline-flex items-center gap-1">
+                          {tr("To'liq o'qish")} <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </SpotlightCard>
+                );
+              })}
             </div>
           </section>
         )}

@@ -1942,51 +1942,81 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedAndFilteredBlogPosts.slice(0, 2).map((post) => (
-                <SpotlightCard
-                  key={post.id}
-                  as="article"
-                  onClick={() => openBlogPost(post)}
-                  className="group p-6 rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 flex flex-col justify-between space-y-4 transition-colors cursor-pointer"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
-                      <span className="text-blue-400 font-medium">{tr(post.category)}</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="font-mono-tabular">
-                        {formatUzbekDate(post.publishedAt, alphabetMode)}
-                      </span>
-                      <span aria-hidden="true">·</span>
-                      <span className="font-mono-tabular">{post.readTime}</span>
+              {sortedAndFilteredBlogPosts.slice(0, 2).map((post) => {
+                const hasFailed = failedBlogImages[post.id];
+                return (
+                  <SpotlightCard
+                    key={post.id}
+                    as="article"
+                    onClick={() => openBlogPost(post)}
+                    className="group rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden transition-colors cursor-pointer"
+                  >
+                    <div
+                      className="relative aspect-video w-full overflow-hidden bg-[#050505] border-b border-zinc-800"
+                      style={{ aspectRatio: '16 / 9' }}
+                    >
+                      {!hasFailed && post.imageUrl ? (
+                        <ParallaxImage
+                          src={post.imageUrl}
+                          alt={post.title}
+                          aspectRatio="16 / 9"
+                          onError={() =>
+                            setFailedBlogImages((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                          className="group-hover:scale-[1.03] transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
+                          <BookOpen className="w-8 h-8 text-blue-500/60 mb-2" />
+                          <span className="text-xs text-zinc-400">{tr(post.category)}</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
                     </div>
-                    <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
-                      <a
-                        href={`?article=${encodeURIComponent(post.slug || post.id)}#blog/${encodeURIComponent(post.slug || post.id)}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          openBlogPost(post);
-                        }}
-                      >
-                        {post.title}
-                      </a>
-                    </h3>
-                    <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                  </div>
-                  <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs">
-                    <span className="font-mono-tabular text-zinc-500 truncate">
-                      {(post.tags || [])
-                        .slice(0, 3)
-                        .map((t) => `#${t}`)
-                        .join(' · ')}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-medium text-white group-hover:text-blue-400 transition-colors shrink-0">
-                      {tr("Maqolani o'qish")} <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                </SpotlightCard>
-              ))}
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2.5">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                          <span className="text-blue-400 font-medium">{tr(post.category)}</span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-mono-tabular">
+                            {formatUzbekDate(post.publishedAt, alphabetMode)}
+                          </span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-mono-tabular">{post.readTime}</span>
+                        </div>
+                        <h3 className="font-display text-lg font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
+                          <a
+                            href={`?article=${encodeURIComponent(post.slug || post.id)}#blog/${encodeURIComponent(post.slug || post.id)}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openBlogPost(post);
+                            }}
+                          >
+                            {post.title}
+                          </a>
+                        </h3>
+                        <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
+                          {post.excerpt}
+                        </p>
+                      </div>
+                      <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs">
+                        <span className="font-mono-tabular text-zinc-500 truncate">
+                          {(post.tags || [])
+                            .slice(0, 3)
+                            .map((t) => `#${t}`)
+                            .join(' · ')}
+                        </span>
+                        <span className="inline-flex items-center gap-1 font-medium text-white group-hover:text-blue-400 transition-colors shrink-0">
+                          {tr("Maqolani o'qish")} <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </SpotlightCard>
+                );
+              })}
             </div>
           </div>
 
@@ -2040,7 +2070,10 @@ export default function App() {
           </div>
 
           {/* 4. Bog'lanish Concise Callout Banner */}
-          <SpotlightCard className="p-6 sm:p-8 rounded-2xl bg-[#0F0F12] border border-zinc-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <SpotlightCard
+            className="p-6 sm:p-8 rounded-2xl bg-[#0F0F12] border border-zinc-800"
+            contentClassName="flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+          >
             <div className="space-y-2 max-w-xl">
               <p className="text-xs text-blue-400 font-medium">
                 {tr("04 · Bog'lanish va Hamkorlik")}
@@ -2405,34 +2438,41 @@ export default function App() {
                         <SpotlightCard
                           as="article"
                           onClick={() => openBlogPost(leadPost)}
-                          className="group rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden grid grid-cols-1 lg:grid-cols-12 transition-colors cursor-pointer"
+                          className="group w-full rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden transition-colors cursor-pointer"
+                          contentClassName="grid grid-cols-1 lg:grid-cols-12 w-full"
                         >
-                          <div className="lg:col-span-6 relative aspect-video lg:aspect-auto lg:min-h-[320px] bg-[#050505] border-b lg:border-b-0 lg:border-r border-zinc-800 overflow-hidden">
-                            {!hasFailed && leadPost.imageUrl ? (
-                              <ParallaxImage
-                                src={leadPost.imageUrl}
-                                alt={leadPost.title}
-                                onError={() =>
-                                  setFailedBlogImages((prev) => ({
-                                    ...prev,
-                                    [leadPost.id]: true,
-                                  }))
-                                }
-                                intensity={16}
-                                className="group-hover:scale-[1.03] transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
-                                <BookOpen className="w-10 h-10 text-blue-500/60 mb-2" />
-                                <span className="text-xs text-zinc-400">
-                                  {tr(leadPost.category)}
-                                </span>
-                              </div>
-                            )}
+                          <div
+                            className="lg:col-span-6 relative aspect-video lg:aspect-auto lg:min-h-[340px] w-full bg-[#050505] border-b lg:border-b-0 lg:border-r border-zinc-800 overflow-hidden"
+                            style={{ aspectRatio: '16 / 9' }}
+                          >
+                            <div className="absolute inset-0 w-full h-full">
+                              {!hasFailed && leadPost.imageUrl ? (
+                                <ParallaxImage
+                                  src={leadPost.imageUrl}
+                                  alt={leadPost.title}
+                                  aspectRatio="16 / 9"
+                                  onError={() =>
+                                    setFailedBlogImages((prev) => ({
+                                      ...prev,
+                                      [leadPost.id]: true,
+                                    }))
+                                  }
+                                  intensity={16}
+                                  className="group-hover:scale-[1.03] transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-zinc-900 via-[#0F0F12] to-[#050505]">
+                                  <BookOpen className="w-10 h-10 text-blue-500/60 mb-2" />
+                                  <span className="text-xs text-zinc-400">
+                                    {tr(leadPost.category)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
                           </div>
 
-                          <div className="lg:col-span-6 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
+                          <div className="lg:col-span-6 w-full p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
                             <div className="space-y-3.5">
                               {/* Unboxed Metadata Line (Zero-Pill Discipline) */}
                               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-zinc-400">
@@ -2571,13 +2611,17 @@ export default function App() {
                           <SpotlightCard
                             as="article"
                             onClick={() => openBlogPost(post)}
-                            className="group h-full rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden flex flex-col justify-between transition-colors cursor-pointer"
+                            className="group h-full w-full rounded-2xl bg-[#0F0F12] border border-zinc-800 hover:border-blue-500/40 overflow-hidden flex flex-col justify-between transition-colors cursor-pointer"
                           >
-                            <div className="relative aspect-4/3 w-full overflow-hidden bg-[#050505] border-b border-zinc-800">
+                            <div
+                              className="relative aspect-4/3 w-full overflow-hidden bg-[#050505] border-b border-zinc-800"
+                              style={{ aspectRatio: '4 / 3' }}
+                            >
                               {!hasFailed && post.imageUrl ? (
                                 <ParallaxImage
                                   src={post.imageUrl}
                                   alt={post.title}
+                                  aspectRatio="4 / 3"
                                   onError={() =>
                                     setFailedBlogImages((prev) => ({
                                       ...prev,

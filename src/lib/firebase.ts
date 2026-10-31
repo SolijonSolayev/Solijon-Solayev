@@ -19,8 +19,10 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 import { DEFAULT_PROFILE_DATA } from '../data/defaultProfile';
 import { ProfileData } from '../types/profile';
-import { getCanonicalRepoKey } from '../utils/githubHelpers';
-import { resolveAssetUrl } from '../utils/assetUrl';
+import {
+  mergePortfolioDataWithDefaults,
+  saveCachedProfile,
+} from '../utils/profileCache';
 
 export const ADMIN_EMAIL = 'solijonsolayev2003@gmail.com';
 export const FIREBASE_PROJECT_ID = firebaseConfig.projectId;
@@ -217,7 +219,6 @@ export function subscribeToPortfolio(
     return () => {};
   }
   const path = `portfolio/${PORTFOLIO_DOC_ID}`;
-  const d = DEFAULT_PROFILE_DATA.personal;
   return onSnapshot(
     doc(db, 'portfolio', PORTFOLIO_DOC_ID),
     (snapshot) => {
@@ -226,147 +227,8 @@ export function subscribeToPortfolio(
         return;
       }
       const data = snapshot.data();
-      const loaded: ProfileData = {
-        personal: {
-          fullName: data.fullName || d.fullName,
-          role: data.role || d.role,
-          kicker: data.kicker || d.kicker,
-          headline:
-            data.headline &&
-            !data.headline.includes('kontent kreyter') &&
-            !data.headline.includes('elektron mahsulotlar sotuvchisi')
-              ? data.headline
-              : d.headline,
-          shortBio:
-            data.shortBio &&
-            data.shortBio.includes('Teamit Academy') &&
-            data.shortBio.includes('Jizzax politexnika')
-              ? data.shortBio
-              : d.shortBio,
-          detailedBio:
-            data.detailedBio &&
-            data.detailedBio.includes('Teamit Academy') &&
-            data.detailedBio.includes('Jizzax politexnika')
-              ? data.detailedBio
-              : d.detailedBio,
-          location: data.location || d.location,
-          availability: data.availability || d.availability,
-          email: data.publicEmail || d.email,
-          phone: data.publicPhone || d.phone,
-          telegram: data.telegram || d.telegram,
-          github: data.github || d.github,
-          linkedin: data.linkedin || d.linkedin,
-          website: data.website || d.website,
-          youtube: data.youtube || d.youtube,
-          wikipedia: data.wikipedia || d.wikipedia,
-          commons: data.commons || d.commons,
-          taplink: data.taplink || d.taplink,
-          etiquetteNote: data.etiquetteNote || d.etiquetteNote,
-          heroImageUrl: resolveAssetUrl(data.heroImageUrl, d.heroImageUrl),
-          yearsOfExperience: data.yearsOfExperience || d.yearsOfExperience,
-        },
-        metrics: Array.isArray(data.metrics) ? data.metrics : DEFAULT_PROFILE_DATA.metrics,
-        services: Array.isArray(data.services) ? data.services : DEFAULT_PROFILE_DATA.services,
-        skillGroups: Array.isArray(data.skillGroups) ? data.skillGroups : DEFAULT_PROFILE_DATA.skillGroups,
-        projects: Array.isArray(data.projects)
-          ? (() => {
-              const defaultProjList = DEFAULT_PROFILE_DATA.projects;
-              const fsProjList = data.projects as ProfileData['projects'];
-              const merged: ProfileData['projects'] = [];
-              const processedKeys = new Set<string>();
-
-              const fsMap = new Map<string, ProfileData['projects'][number]>();
-              for (const fsP of fsProjList) {
-                const key = getCanonicalRepoKey(fsP);
-                if (key) fsMap.set(key, fsP);
-              }
-
-              for (const defProj of defaultProjList) {
-                const key = getCanonicalRepoKey(defProj);
-                if (key) processedKeys.add(key);
-                const fsMatch = fsMap.get(key);
-                if (fsMatch) {
-                  merged.push({
-                    ...defProj,
-                    ...fsMatch,
-                    imageUrl: resolveAssetUrl(fsMatch.imageUrl, defProj.imageUrl),
-                  });
-                } else {
-                  merged.push(defProj);
-                }
-              }
-
-              for (const fsProj of fsProjList) {
-                const key = getCanonicalRepoKey(fsProj);
-                if (key && !processedKeys.has(key)) {
-                  processedKeys.add(key);
-                  merged.push({
-                    ...fsProj,
-                    imageUrl: resolveAssetUrl(fsProj.imageUrl, ''),
-                  });
-                }
-              }
-              return merged;
-            })()
-          : DEFAULT_PROFILE_DATA.projects,
-        experience: Array.isArray(data.experience)
-          ? (() => {
-              const defaultExpList = DEFAULT_PROFILE_DATA.experience;
-              const fsExpList = data.experience as ProfileData['experience'];
-              const fsMap = new Map(fsExpList.map((e) => [e.id, e]));
-              const merged: ProfileData['experience'] = [];
-              const processed = new Set<string>();
-
-              for (const defItem of defaultExpList) {
-                processed.add(defItem.id);
-                const fsItem = fsMap.get(defItem.id);
-                if (fsItem) {
-                  merged.push({ ...defItem, ...fsItem });
-                } else {
-                  merged.push(defItem);
-                }
-              }
-              for (const fsItem of fsExpList) {
-                if (!processed.has(fsItem.id)) {
-                  merged.push(fsItem);
-                }
-              }
-              return merged;
-            })()
-          : DEFAULT_PROFILE_DATA.experience,
-        blogPosts: Array.isArray(data.blogPosts)
-          ? (() => {
-              const defaultPosts = DEFAULT_PROFILE_DATA.blogPosts || [];
-              const fsPosts = data.blogPosts as NonNullable<ProfileData['blogPosts']>;
-              const fsMap = new Map(fsPosts.map((bp) => [bp.id, bp]));
-              const merged: NonNullable<ProfileData['blogPosts']> = [];
-              const processed = new Set<string>();
-
-              for (const defPost of defaultPosts) {
-                processed.add(defPost.id);
-                const fsPost = fsMap.get(defPost.id);
-                if (fsPost) {
-                  merged.push({
-                    ...defPost,
-                    ...fsPost,
-                    imageUrl: resolveAssetUrl(fsPost.imageUrl, defPost.imageUrl),
-                  });
-                } else {
-                  merged.push(defPost);
-                }
-              }
-              for (const fsPost of fsPosts) {
-                if (!processed.has(fsPost.id)) {
-                  merged.push({
-                    ...fsPost,
-                    imageUrl: resolveAssetUrl(fsPost.imageUrl, ''),
-                  });
-                }
-              }
-              return merged;
-            })()
-          : DEFAULT_PROFILE_DATA.blogPosts,
-      };
+      const loaded = mergePortfolioDataWithDefaults(data);
+      saveCachedProfile(loaded);
       onData(loaded);
     },
     (error) => {
@@ -385,6 +247,7 @@ export async function savePortfolioToFirestore(profile: ProfileData): Promise<vo
   try {
     const payload = sanitizePortfolioPayload(profile, user.uid);
     await setDoc(doc(db, 'portfolio', PORTFOLIO_DOC_ID), payload);
+    saveCachedProfile(profile);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }

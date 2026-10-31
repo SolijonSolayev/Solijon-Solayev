@@ -607,6 +607,34 @@ export const DEFAULT_PROFILE_DATA: ProfileData = {
   ],
   blogPosts: [
     {
+      id: 'post_1793476733443',
+      slug: 'prezident-qaroriga-pq-265-son-15-07-2026-y-kora-https-lex-uz-uz-docs-8329406-202',
+      title:
+        'Prezident qaroriga (PQ-265-son, 15.07.2026 y.) köra (https://lex.uz/uz/docs/-8329406), 2026-yil 1-noyabrdan boşlab',
+      category: 'Shaxsiy fikrlar',
+      publishedAt: '2026-10-31',
+      readTime: '1 daqiqa',
+      featured: true,
+      published: true,
+      excerpt:
+        'Prezident qarorining (PQ-265-son) mazmuni — fuqarolarni noqonuniy, bezovta qiluvchi va ruxsatsiz reklamalardan (spamdan) himoya qilishga qaratilgan:\n\nRozilik majburiyati: Har qanday SMS-reklama uchun fuqaroning aniq (yozma yoki elektron) ruxsati shart.\nTungi va kechki taqiq: Soat 18:00 dan 09:00 gacha reklama qo‘ng‘iroqlari va xabarlar yuborish qat’iyan man etiladi.\nQonuniy nazorat: Reklama jo‘natuvchi kompaniyalar o‘z axborot tizimini davlat reyestridan o‘tkazgan bo‘lishi lozim.\nBloklash huquqi: Abonent istalgan paytda operatordan bunday reklamalarni to‘xtatishni (bloklashni) talab qilishi mumkin.',
+      imageUrl: resolveAssetUrl(
+        'https://commons.wikimedia.org/wiki/File:Party_SMS.jpg#/media/File:Party_SMS.jpg'
+      ),
+      tags: ['Prezident qarori', 'reklama', 'SMS', 'qönğiroqlar'],
+      content: `## Prezident qaroriga (PQ-265-son, 15.07.2026 y.) köra (https://lex.uz/uz/docs/-8329406), 2026-yil 1-noyabrdan boşlab:
+
+🔹 SMS orqali tovar yoki xizmatni reklama qiluvçi har qanday yuridik va jismoniy şaxs buni faqat şaxsning yozma yoki elektron roziligini olgandan söng amalga oşira oladi;
+
+🔹 reklama qönğiroqlari va xabarnomalarini telekommunikatsiya tarmoqlari (mobil aloqa) orqali soat 18:00 dan 09:00 gaça tarqatiş taqiqlanadi;
+
+🔹 reklama qönğiroqlari va SMS yuboriş xizmatini körsatuvçi kompaniyalar faqat öz axborot tizimlarini Şaxsga doir ma’lumotlar bazalarining davlat reyestrida röyxatdan ötkazgandan keyin faoliyat yurita oladi;
+
+🔹 mobil aloqa operatorlari özlari tomonidan tarqatiladigan reklama qönğiroqlari va xabarnomalarini abonent söroviga köra töliq yoki qisman bloklaşi şart.
+
+Bu talablarga rioya etmaslik reklama hamda şaxsga doir ma’lumotlar töğrisidagi qonunçilikni buziş hisoblanadi.`,
+    },
+    {
       id: 'post_solaris3d',
       slug: 'solaris-3d-jonli-astronomiya-observatoriya',
       title: 'Solaris 3D (solaris3d.uz): Veb-brauzerda real vaqt rejimida 3D astronomiya va kosmik observatoriya yaratish tajribasi',

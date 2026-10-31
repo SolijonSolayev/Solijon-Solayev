@@ -23,6 +23,14 @@ export function resolveAssetUrl(url?: string, fallbackUrl = ''): string {
     raw.startsWith('data:') ||
     raw.startsWith('blob:')
   ) {
+    // Convert Wikimedia Commons / Wikipedia File viewer URLs into direct image streams
+    const wikiMediaMatch =
+      raw.match(/#\/media\/(?:File|Fayl):([^#?/]+)/i) ||
+      raw.match(/\/wiki\/(?:File|Fayl):([^#?/]+)/i);
+    if (wikiMediaMatch && wikiMediaMatch[1]) {
+      const cleanFile = decodeURIComponent(wikiMediaMatch[1]);
+      return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(cleanFile)}?width=800`;
+    }
     return raw;
   }
 

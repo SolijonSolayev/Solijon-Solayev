@@ -103,6 +103,11 @@ import { soundEffects } from './utils/soundEffects';
 import { useHapticFeedback } from './hooks/useHapticFeedback';
 import { downloadVCard } from './utils/vcard';
 import { getCanonicalRepoKey } from './utils/githubHelpers';
+import {
+  fetchCloudPortfolioFast,
+  loadCachedProfile,
+  saveCachedProfile,
+} from './utils/profileCache';
 
 export type ActiveSectionPage = 'home' | 'loyihalar' | 'blog' | 'tajriba' | 'boglanish';
 export type ThemeMode = 'dark' | 'light';
@@ -175,7 +180,7 @@ function resolveBlogIdentifierFromLocation(): string | null {
 }
 
 export default function App() {
-  const [rawProfile, setRawProfile] = useState<ProfileData>(DEFAULT_PROFILE_DATA);
+  const [rawProfile, setRawProfile] = useState<ProfileData>(() => loadCachedProfile());
   const { triggerLight, triggerMedium, triggerSuccess, triggerSelection } = useHapticFeedback();
 
   // Supported Language state (uz / en)
@@ -323,7 +328,7 @@ export default function App() {
   const [selectedBlogCategory, setSelectedBlogCategory] = useState<'Barchasi' | BlogCategory>(
     'Barchasi'
   );
-  const [blogSortOrder, setBlogSortOrder] = useState<'featured' | 'newest' | 'oldest'>('featured');
+  const [blogSortOrder, setBlogSortOrder] = useState<'featured' | 'newest' | 'oldest'>('newest');
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [failedBlogImages, setFailedBlogImages] = useState<Record<string, boolean>>({});
 
@@ -425,6 +430,15 @@ export default function App() {
       window.removeEventListener('keydown', startPortfolioSync);
       window.removeEventListener('scroll', startPortfolioSync);
       window.removeEventListener('touchstart', startPortfolioSync);
+
+      // 1. Instant ~80ms zero-SDK REST fetch so new articles appear before Firebase SDK even finishes downloading
+      void fetchCloudPortfolioFast().then((fastProfile) => {
+        if (!cancelled && fastProfile) {
+          setRawProfile(fastProfile);
+        }
+      });
+
+      // 2. Live WebSocket listener for real-time updates
       void import('./lib/firebase').then(({ subscribeToPortfolio }) => {
         if (cancelled) return;
         unsubPortfolio = subscribeToPortfolio((cloudProfile) => {
@@ -435,7 +449,18 @@ export default function App() {
       });
     };
 
-    if (window.location.hash === '#admin') {
+    const initialPage = resolvePageFromHash(window.location.hash, window.location.search);
+    const initialBlogId = resolveBlogIdentifierFromLocation();
+    if (initialBlogId) {
+      // Preload article view chunk immediately in parallel with data fetch
+      void import('./components/BlogArticleView');
+    }
+
+    if (
+      window.location.hash === '#admin' ||
+      initialPage === 'blog' ||
+      Boolean(initialBlogId)
+    ) {
       startPortfolioSync();
     } else {
       window.addEventListener('pointerdown', startPortfolioSync, { once: true, passive: true });
@@ -450,11 +475,17 @@ export default function App() {
       setIsAdminRoute(hash === '#admin');
       const blogId = resolveBlogIdentifierFromLocation();
       if (blogId) {
+        startPortfolioSync();
+        void import('./components/BlogArticleView');
         setActiveBlogIdentifier(blogId);
         setActivePage('blog');
       } else {
         setActiveBlogIdentifier(null);
-        setActivePage(resolvePageFromHash(hash, window.location.search));
+        const nextPage = resolvePageFromHash(hash, window.location.search);
+        if (nextPage === 'blog' || hash === '#admin') {
+          startPortfolioSync();
+        }
+        setActivePage(nextPage);
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -853,7 +884,10 @@ export default function App() {
           profile={rawProfile}
           alphabetMode={alphabetMode}
           onAlphabetModeChange={handleAlphabetChange}
-          onUpdateLocalProfile={setRawProfile}
+          onUpdateLocalProfile={(next) => {
+            saveCachedProfile(next);
+            setRawProfile(next);
+          }}
           onExitAdmin={exitAdminPanel}
           initialEditPostId={adminInitialEditPostId}
           onClearInitialEditPost={() => setAdminInitialEditPostId(null)}

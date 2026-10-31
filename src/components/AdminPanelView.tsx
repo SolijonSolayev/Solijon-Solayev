@@ -313,7 +313,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
       category: 'Dasturlash va IT',
       publishedAt: today,
       readTime: '3 daqiqa',
-      featured: false,
+      featured: true,
       published: true,
       excerpt: tr(
         "Ushbu maqolada ko'rib chiqiladigan asosiy mavzu va foydali xulosalar haqida qisqacha anons."
